@@ -55,14 +55,26 @@ model Session {
 }
 
 model User {
-    id            String    @id @default(cuid())
+    id            String     @id @default(cuid())
     name          String?
-    email         String?   @unique
+    email         String?    @unique
     emailVerified DateTime?
+    password      String?
     image         String?
+    apiKey        String?    @unique
     accounts      Account[]
     sessions      Session[]
     posts         Post[]
+    Document      Document[]
+}
+
+model Document {
+    id        String   @id @default(cuid())
+    userId    String
+    content   String
+    createdAt DateTime @default(now())
+
+    user User @relation(fields: [userId], references: [id])
 }
 
 model VerificationToken {
