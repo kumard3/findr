@@ -1,5 +1,4 @@
 import GenerateApiKey from "@/components/GenerateApiKey";
-import IndexData from "@/components/IndexData";
 import { movies } from "../components/movies";
 import SearchData from "@/components/SearchData";
 import { Button } from "@/components/ui/button";
@@ -60,7 +59,7 @@ export default function Home() {
 
       <GenerateApiKey />
       <Button onClick={indexDocument}> indexDocument</Button>
-      <IndexData />
+      {/* <IndexData /> */}
 
       <SearchData />
     </div>

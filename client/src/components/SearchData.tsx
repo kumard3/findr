@@ -106,60 +106,12 @@ import { Input } from "./ui/input";
 const API_KEY = "sk_h9sfDd1CIJYpSt9_x1bL3oU4VNghU1vP";
 const API_URL = "http://localhost:9000"; // e.g., "http://localhost:8108"
 
- const SearchData = () => {
+const SearchData = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  // Sample movie data for indexing
-  const sampleMovies = [
-    {
-      id: 1,
-      title: "The Shawshank Redemption",
-      overview: "Two imprisoned men bond over a number of years...",
-      genres: ["Drama"],
-      release_date: 779328000,
-    },
-    {
-      id: 2,
-      title: "The Godfather",
-      overview: "The aging patriarch of an organized crime dynasty...",
-      genres: ["Crime", "Drama"],
-      release_date: 69312000,
-    },
-  ];
-
-  const handleIndex = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await fetch(`${API_URL}/api/index`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": API_KEY,
-        },
-        body: JSON.stringify(sampleMovies),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message);
-      }
-
-      const result = await response.json();
-      console.log("Indexed successfully:", result);
-      alert("Documents indexed successfully!");
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to index documents"
-      );
-      console.error("Indexing error:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
@@ -197,18 +149,6 @@ const API_URL = "http://localhost:9000"; // e.g., "http://localhost:8108"
     <div className="max-w-2xl mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Typesense Test</h1>
 
-      {/* Index Section */}
-      <div className="mb-8">
-        <h2 className="text-xl font-semibold mb-2">Index Test Data</h2>
-        <Button
-          onClick={handleIndex}
-          disabled={loading}
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:opacity-50"
-        >
-          {loading ? "Indexing..." : "Index Sample Movies"}
-        </Button>
-      </div>
-
       {/* Search Section */}
       <div className="mb-8">
         <h2 className="text-xl font-semibold mb-2">Search</h2>
@@ -240,6 +180,7 @@ const API_URL = "http://localhost:9000"; // e.g., "http://localhost:8108"
         <h2 className="text-xl font-semibold mb-2">Search Results</h2>
         {searchResults.length > 0 ? (
           <div className="space-y-4">
+            {/* biome-ignore lint/suspicious/noExplicitAny: <explanation> */}
             {searchResults.map((result: any) => (
               <div
                 key={result.document.id}
@@ -262,6 +203,5 @@ const API_URL = "http://localhost:9000"; // e.g., "http://localhost:8108"
     </div>
   );
 };
-
 
 export default SearchData;
