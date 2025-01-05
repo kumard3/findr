@@ -1,6 +1,8 @@
 import GenerateApiKey from "@/components/GenerateApiKey";
 import IndexData from "@/components/IndexData";
+import { movies } from "../components/movies";
 import SearchData from "@/components/SearchData";
+import { Button } from "@/components/ui/button";
 import { api } from "@/utils/api";
 import { useSession } from "next-auth/react";
 import type React from "react";
@@ -27,7 +29,6 @@ export default function Home() {
 
   console.log(data, "data");
   console.log(session, "data");
-
 
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">
@@ -58,10 +59,30 @@ export default function Home() {
       </div>
 
       <GenerateApiKey />
-
+      <Button onClick={indexDocument}> indexDocument</Button>
       <IndexData />
 
       <SearchData />
     </div>
   );
 }
+
+// Example request to index a document
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+const indexDocument = async (document: any) => {
+  const response = await fetch("http://localhost:9000/api/index", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": "sk_h9sfDd1CIJYpSt9_x1bL3oU4VNghU1vP",
+    },
+    body: JSON.stringify(movies),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message);
+  }
+
+  return await response.json();
+};

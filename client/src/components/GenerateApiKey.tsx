@@ -130,7 +130,7 @@ const GenerateApiKey = () => {
                 <Label key={op} className="inline-flex items-center">
                   <input
                     type="checkbox"
-                    checked={operations.includes(op)}
+                    checked={operations.includes(op as "search" | "write" | "delete")}
                     onChange={(e) => {
                       if (e.target.checked) {
                         setOperations([

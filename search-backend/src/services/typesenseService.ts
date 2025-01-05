@@ -1,5 +1,19 @@
 import { Client } from "typesense";
 import type { SearchParams, IndexError, Env } from "../types";
+import Typesense from "typesense";
+
+// const client = new Typesense.Client({
+//   nodes: [
+//     {
+//       host: 'localhost', // Replace with your server's IP if hosting remotely
+//       port: 8108,
+//       protocol: 'http',
+//     },
+//   ],
+//   apiKey: 'xyz', // Replace with your actual admin API key
+// });
+
+// export default client;
 
 export class TypesenseService {
   private client: Client;
@@ -8,12 +22,12 @@ export class TypesenseService {
     this.client = new Client({
       nodes: [
         {
-          host: env.TYPESENSE_HOST,
-          port: env.TYPESENSE_PORT,
+          host: "localhost",
+          port: 8108,
           protocol: "http",
         },
       ],
-      apiKey: env.TYPESENSE_ADMIN_KEY,
+      apiKey: "xyz",
       connectionTimeoutSeconds: 2,
     });
   }
@@ -21,19 +35,16 @@ export class TypesenseService {
   async createOrGetCollection(userId: string) {
     const collectionName = `collection_${userId}`;
     try {
-      // Try to retrieve existing collection
       return await this.client.collections(collectionName).retrieve();
     } catch (error) {
-      // If collection doesn't exist, create it
+      // Create collection with dynamic schema
 
       return await this.client.collections().create({
         name: collectionName,
         fields: [
           { name: "user_id", type: "string", facet: true },
-          { name: "title", type: "string" },
-          { name: "content", type: "string" },
-          { name: "indexed_at", type: "int64" },
-          // Optional fields with auto schema detection
+          { name: "indexed_at", type: "int64", sort: true },
+          // Allow any field with auto schema detection
           { name: ".*", type: "auto" },
         ],
         default_sorting_field: "indexed_at",
@@ -44,23 +55,26 @@ export class TypesenseService {
   // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   async indexDocument(userId: string, document: any) {
     try {
-      // Ensure collection exists
       await this.createOrGetCollection(userId);
-
       const collection = this.client.collections(`collection_${userId}`);
-      const enrichedDocument = {
-        ...document,
+
+      const documents = Array.isArray(document) ? document : [document];
+
+      const enrichedDocuments = documents.map((doc) => ({
+        ...doc,
         user_id: userId,
         indexed_at: Date.now(),
-        id: `${userId}_${Date.now()}_${Math.random().toString(36).slice(2)}`,
-      };
+        // Preserve original id if exists, otherwise generate one
+        id:
+          doc.id?.toString() ||
+          `${userId}_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+      }));
 
-      // Validate document size
-      if (JSON.stringify(enrichedDocument).length > 100000) {
-        throw new Error("Document too large");
-      }
-
-      return await collection.documents().create(enrichedDocument);
+      // Use import for better performance
+      return await collection.documents().import(enrichedDocuments, {
+        action: "create",
+        dirty_values: "coerce_or_reject",
+      });
     } catch (error) {
       const indexError: IndexError = new Error(
         error instanceof Error ? error.message : "Index error"

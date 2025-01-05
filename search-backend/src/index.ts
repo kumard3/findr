@@ -157,5 +157,9 @@ app.get("/api/search", async (c) => {
     });
   }
 });
-
+const port = Bun.env.PORT || 8000;
+Bun.serve({
+  port,
+  fetch: app.fetch,
+});
 export default app;

@@ -19,30 +19,44 @@ export interface TypesenseResponse {
   page: number;
   search_time_ms?: number;
 }
+const MAX_DOCUMENT_SIZE = 100000; // 100KB per document
 
-export const documentSchema = z.object({
-  title: z.string().min(1).max(200),
-  content: z.string().max(100000),
-  metadata: z.object({
-    language: z.string().optional(),
-    tags: z.array(z.string()).optional(),
-    category: z.string().optional(),
-    author: z.string().optional(),
-    created_at: z.number().optional(),
-    updated_at: z.number().optional(),
-    collection_name: z.string().optional(),
-  }).optional(),
-  attributes: z.record(z.string(), z.union([
-    z.string(),
-    z.number(),
-    z.boolean(),
-    z.array(z.string()),
-    z.array(z.number())
-  ])).optional(),
-}).refine(
-  data => JSON.stringify(data).length <= 100000,
-  "Document size exceeds 100KB limit"
-);
+// Single document validation
+const documentValidation = z
+  .record(z.string(), z.any())
+  .refine(
+    (doc) => JSON.stringify(doc).length <= MAX_DOCUMENT_SIZE,
+    `Individual document size exceeds ${MAX_DOCUMENT_SIZE / 1000}KB limit`
+  );
+
+// Schema that accepts single document or array of documents
+export const documentSchema = z.union([
+  documentValidation,
+  z.array(documentValidation),
+]);
+// export const documentSchema = z.object({
+//   title: z.string().min(1).max(200),
+//   content: z.string().max(100000),
+//   metadata: z.object({
+//     language: z.string().optional(),
+//     tags: z.array(z.string()).optional(),
+//     category: z.string().optional(),
+//     author: z.string().optional(),
+//     created_at: z.number().optional(),
+//     updated_at: z.number().optional(),
+//     collection_name: z.string().optional(),
+//   }).optional(),
+//   attributes: z.record(z.string(), z.union([
+//     z.string(),
+//     z.number(),
+//     z.boolean(),
+//     z.array(z.string()),
+//     z.array(z.number())
+//   ])).optional(),
+// }).refine(
+//   data => JSON.stringify(data).length <= 100000,
+//   "Document size exceeds 100KB limit"
+// );
 
 export type ValidatedDocument = z.infer<typeof documentSchema>;
 
@@ -60,7 +74,6 @@ export interface SearchParams {
 export interface UserWithApiKey extends ApiKey {
   user: User;
 }
-
 
 export interface Env {
   TYPESENSE_ADMIN_KEY: string;
@@ -113,7 +126,6 @@ export interface UsageMetrics {
   processingTime?: number;
   dataSize?: number;
 }
-
 
 export interface TypesenseResponse {
   found: number;
