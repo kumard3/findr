@@ -3,10 +3,11 @@ import IndexData from "@/components/IndexData";
 import SearchData from "@/components/SearchData";
 import { api } from "@/utils/api";
 import { useSession } from "next-auth/react";
-import React, { ChangeEvent, useState } from "react";
+import type React from "react";
+import { useState } from "react";
 
 export default function Home() {
-  const session = useSession()
+  const session = useSession();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -25,6 +26,8 @@ export default function Home() {
   };
 
   console.log(data, "data");
+  console.log(session, "data");
+
 
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">
@@ -44,6 +47,7 @@ export default function Home() {
           value={formData.password}
           onChange={handleInputChange}
         />
+        {/* biome-ignore lint/a11y/useButtonType: <explanation> */}
         <button
           onClick={() => {
             mutate(formData);

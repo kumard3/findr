@@ -85,6 +85,7 @@ export const authOptions: NextAuthOptions = {
             email: user.email,
             name: user.name,
           };
+          // biome-ignore lint/style/noUselessElse: <explanation>
         } else {
           return null;
         }

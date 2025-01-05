@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import type { ApiKeyWithUser } from "../types";
+import type { ApiKeyInfo, ApiKeyWithUser } from "../types";
 
 export class ApiKeyValidator {
   private prisma: PrismaClient;

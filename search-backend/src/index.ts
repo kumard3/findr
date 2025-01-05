@@ -1,28 +1,28 @@
-// import { Hono } from 'hono'
-
-// const app = new Hono()
-
-// app.get('/', (c) => {
-//   return c.text('Hello Hono!')
-// })
-
-// export default app
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { HTTPException } from "hono/http-exception";
 import { ApiKeyValidator } from "./services/apiKeyValidator";
 import { TypesenseService } from "./services/typesenseService";
-import { errorHandler } from "./middleware/errorHandler";
-import type { Env, SearchParams } from "./types";
-import { UsageLogger } from "./services/usageLogger";
 
-const app = new Hono<{ Bindings: Env }>();
+import { documentSchema, type Env, type SearchParams } from "./types";
+import { db } from "./db";
+
+interface CustomContext {
+  keyInfo: {
+    user: {
+      id: string;
+    };
+    allowedOperations: string[];
+    id: string;
+  };
+}
+
+const app = new Hono<{ Bindings: Env; Variables: CustomContext }>();
 
 // Middleware
 app.use("*", cors());
-app.use("*", errorHandler);
 
-// Validate API key for all routes
+// API key validation middleware
 app.use("*", async (c, next) => {
   const apiKey = c.req.header("x-api-key");
   if (!apiKey) {
@@ -32,15 +32,6 @@ app.use("*", async (c, next) => {
   const validator = new ApiKeyValidator();
   try {
     const keyInfo = await validator.validateKey(apiKey);
-    const withinLimit = await validator.checkRateLimit(keyInfo);
-
-    if (!withinLimit) {
-      throw new HTTPException(429, {
-        message: "Rate limit exceeded",
-        cause: { limit: keyInfo.rateLimit, window: "1 minute" },
-      });
-    }
-
     c.set("keyInfo", keyInfo);
     await next();
   } catch (error) {
@@ -53,64 +44,67 @@ app.use("*", async (c, next) => {
 // Index API
 app.post("/api/index", async (c) => {
   const keyInfo = c.get("keyInfo");
-  const validator = new ApiKeyValidator();
-  const logger = new UsageLogger();
-
-  // Validate operation permission
-  if (!(await validator.checkOperationAllowed(keyInfo, "write"))) {
-    throw new HTTPException(403, { message: "Write permission required" });
-  }
-
-  // Check user limits
-  await validator.checkUserLimits(keyInfo);
+  const typesense = new TypesenseService(c.env);
 
   try {
-    const document = await c.req.json();
+    // Check permissions
+    if (!keyInfo.allowedOperations.includes("write")) {
+      throw new HTTPException(403, { message: "Write permission required" });
+    }
+
+    // Validate document
+    const rawDocument = await c.req.json();
+    const document = await documentSchema.parseAsync(rawDocument);
     const documentSize = JSON.stringify(document).length;
 
     // Index document
-    const typesense = new TypesenseService(c.env);
     const result = await typesense.indexDocument(keyInfo.user.id, document);
 
-    // Log successful operation
-    await logger.logOperation({
-      userId: keyInfo.user.id,
-      operation: "index",
-      status: "success",
-      apiKeyId: keyInfo.id,
-      metrics: {
+    // Log operation
+    await db.usageLog.create({
+      data: {
+        userId: keyInfo.user.id,
+        operation: "index",
+        status: "success",
+        apiKeyId: keyInfo.id,
         documentsProcessed: 1,
         dataSize: documentSize,
+        ipAddress: c.req.header("x-forwarded-for"),
+        userAgent: c.req.header("user-agent"),
       },
-      request: c.req,
     });
 
-    // Update collection stats
-    if (result.collectionId) {
-      await logger.updateCollectionStats(result.collectionId, documentSize);
-    }
+    // Update user usage
+    await db.user.update({
+      where: { id: keyInfo.user.id },
+      data: {
+        used: { increment: 1 },
+        storage: { increment: documentSize },
+      },
+    });
 
     return c.json({
       success: true,
       document: result,
-      usage: {
-        used: keyInfo.user.used + 1,
-        limit: keyInfo.user.limit,
-        storage: keyInfo.user.storage + documentSize,
-      },
     });
   } catch (error) {
-    // Log failed operation
-    await logger.logOperation({
-      userId: keyInfo.user.id,
-      operation: "index",
-      status: "failed",
-      apiKeyId: keyInfo.id,
-      error: error as Error,
-      request: c.req,
+    // Log error
+    await db.usageLog.create({
+      data: {
+        userId: keyInfo.user.id,
+        operation: "index",
+        status: "failed",
+        errorMessage: error instanceof Error ? error.message : "Unknown error",
+        apiKeyId: keyInfo.id,
+        ipAddress: c.req.header("x-forwarded-for"),
+        userAgent: c.req.header("user-agent"),
+      },
     });
 
-    throw error;
+    if (error instanceof HTTPException) throw error;
+    throw new HTTPException(500, {
+      message: error instanceof Error ? error.message : "Internal server error",
+    });
   }
 });
 
@@ -119,22 +113,47 @@ app.get("/api/search", async (c) => {
   const keyInfo = c.get("keyInfo");
   const typesense = new TypesenseService(c.env);
 
-  const searchParams: SearchParams = {
-    q: c.req.query("q") || "",
-    query_by: c.req.query("query_by") || "_all",
-    per_page: parseInt(c.req.query("per_page") || "10"),
-    page: parseInt(c.req.query("page") || "1"),
-    facet_by: c.req.query("facet_by"),
-    sort_by: c.req.query("sort_by"),
-  };
-
   try {
-    const results = await typesense.search(keyInfo.userId, searchParams);
+    const searchParams: SearchParams = {
+      q: c.req.query("q") || "",
+      query_by: c.req.query("query_by") || "content",
+      per_page: Number.parseInt(c.req.query("per_page") || "10"),
+      page: Number.parseInt(c.req.query("page") || "1"),
+      collection_name: c.req.query("collection_name") || "default",
+    };
+
+    const results = await typesense.search(keyInfo.user.id, searchParams);
+
+    // Log search
+    await db.usageLog.create({
+      data: {
+        userId: keyInfo?.user?.id,
+        operation: "search",
+        status: "success",
+        apiKeyId: keyInfo.id,
+        processingTime: results.search_time_ms,
+        ipAddress: c.req.header("x-forwarded-for"),
+        userAgent: c.req.header("user-agent"),
+      },
+    });
+
     return c.json(results);
   } catch (error) {
+    // Log error
+    await db.usageLog.create({
+      data: {
+        userId: keyInfo.user.id,
+        operation: "search",
+        status: "failed",
+        errorMessage: error instanceof Error ? error.message : "Search failed",
+        apiKeyId: keyInfo.id,
+        ipAddress: c.req.header("x-forwarded-for"),
+        userAgent: c.req.header("user-agent"),
+      },
+    });
+
     throw new HTTPException(400, {
-      message: "Search error",
-      cause: error,
+      message: error instanceof Error ? error.message : "Search error",
     });
   }
 });

@@ -1,32 +1,66 @@
-// import type { ApiKey, User } from "@prisma/client";
-
 import type { ApiKey, User } from "@prisma/client";
 
-// export interface Env {
-//   TYPESENSE_ADMIN_KEY: string;
-//   DATABASE_URL: string;
-//   TYPESENSE_HOST: string;
-//   TYPESENSE_PORT: number;
-// }
+import { z } from "zod";
+
+export interface Env {
+  TYPESENSE_ADMIN_KEY: string;
+  TYPESENSE_HOST: string;
+  TYPESENSE_PORT: number;
+  DATABASE_URL: string;
+}
+
+export interface ApiKeyWithUser extends ApiKey {
+  user: User;
+}
+
+export interface TypesenseResponse {
+  found: number;
+  hits: unknown[];
+  page: number;
+  search_time_ms?: number;
+}
+
+export const documentSchema = z.object({
+  title: z.string().min(1).max(200),
+  content: z.string().max(100000),
+  metadata: z.object({
+    language: z.string().optional(),
+    tags: z.array(z.string()).optional(),
+    category: z.string().optional(),
+    author: z.string().optional(),
+    created_at: z.number().optional(),
+    updated_at: z.number().optional(),
+    collection_name: z.string().optional(),
+  }).optional(),
+  attributes: z.record(z.string(), z.union([
+    z.string(),
+    z.number(),
+    z.boolean(),
+    z.array(z.string()),
+    z.array(z.number())
+  ])).optional(),
+}).refine(
+  data => JSON.stringify(data).length <= 100000,
+  "Document size exceeds 100KB limit"
+);
+
+export type ValidatedDocument = z.infer<typeof documentSchema>;
+
+export interface SearchParams {
+  q: string;
+  query_by: string;
+  per_page?: number;
+  page?: number;
+  filter_by?: string;
+  sort_by?: string;
+  facet_by?: string;
+  collection_name?: string;
+}
 
 export interface UserWithApiKey extends ApiKey {
   user: User;
 }
 
-// export interface TypesenseDocument {
-//   // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-//   [key: string]: any;
-//   user_id: string;
-//   created_at: number;
-// }
-
-// export interface SearchParams {
-//   q: string;
-//   query_by?: string;
-//   per_page?: number;
-//   filter_by?: string;
-//   sort_by?: string;
-// }
 
 export interface Env {
   TYPESENSE_ADMIN_KEY: string;
