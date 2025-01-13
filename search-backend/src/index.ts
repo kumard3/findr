@@ -6,6 +6,7 @@ import { TypesenseService } from "./services/typesenseService";
 
 import { documentSchema, type Env, type SearchParams } from "./types";
 import { db } from "./db";
+// import sharp from "sharp";
 
 interface CustomContext {
   keyInfo: {
@@ -157,6 +158,37 @@ app.get("/api/search", async (c) => {
     });
   }
 });
+// app.get("/image", async (c) => {
+//   const { width, height, quality, format, url } = c.req.query();
+
+//   try {
+//     const imageResponse = await fetch(url);
+//     const imageBuffer = await imageResponse.arrayBuffer();
+
+//     const transformer = sharp(Buffer.from(imageBuffer))
+//       .resize(
+//         width ? Number.parseInt(width) : undefined,
+//         height ? Number.parseInt(height) : undefined,
+//         { fit: "inside" }
+//       )
+//       .toFormat("webp", {
+//         compressionLevel: 6,
+//       });
+
+//     // if (quality) {
+//     //   transformer = transformer.quality(parseInt(quality));
+//     // }
+
+//     const processedImage = await transformer.toBuffer();
+
+//     c.header("Content-Type", `image/${format || "webp"}`);
+//     c.header("Cache-Control", "public, max-age=31536000");
+
+//     return c.body(processedImage);
+//   } catch (error) {
+//     return c.json({ error: "Image processing failed" }, 500);
+//   }
+// });
 const port = Bun.env.PORT || 8000;
 Bun.serve({
   port,

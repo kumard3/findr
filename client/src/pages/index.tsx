@@ -5,10 +5,12 @@ import { Button } from "@/components/ui/button";
 import { api } from "@/utils/api";
 import { useSession } from "next-auth/react";
 import type React from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 
 export default function Home() {
   const session = useSession();
+  const router = useRouter();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -28,6 +30,12 @@ export default function Home() {
 
   console.log(data, "data");
   console.log(session, "data");
+  useEffect(() => {
+    if (session.status === "unauthenticated") {
+      console.log(session, "session");
+      router.push("/login");
+    }
+  }, [session, router]);
 
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">

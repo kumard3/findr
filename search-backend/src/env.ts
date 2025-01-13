@@ -7,5 +7,4 @@ if (typeof Bun !== "undefined") {
 } else {
   // Fallback to process.env for other environments
   const config = process.env;
-}
-[7];
+}[7];
