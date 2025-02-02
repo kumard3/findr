@@ -2,6 +2,7 @@ import { Client } from "typesense";
 import type { SearchParams, IndexError, Env } from "../types";
 import { z } from "zod";
 import { db } from "../db";
+import env from "../env";
 
 const MAX_DOCUMENT_SIZE = 100000; // 100KB per document
 
@@ -17,11 +18,12 @@ const DocumentSchema = z.union([
   z.array(documentValidation),
 ]);
 
-const UsageSchema = z.object({
-  documentsProcessed: z.number(),
-  dataSize: z.number(),
-  requestCount: z.number(),
-  storageUsed: z.number(),
+
+
+const TypesenseConfigSchema = z.object({
+  host: z.string().min(1),
+  port: z.number().int().positive(),
+  adminKey: z.string().min(1),
 });
 
 export class TypesenseService {
@@ -31,16 +33,22 @@ export class TypesenseService {
     return this._client;
   }
 
-  constructor(env: Env) {
+  constructor() {
+    const config = TypesenseConfigSchema.parse({
+      host: env.TYPESENSE_HOST,
+      port: env.TYPESENSE_PORT,
+      adminKey: env.TYPESENSE_ADMIN_KEY,
+    });
+
     this._client = new Client({
       nodes: [
         {
-          host: env.TYPESENSE_HOST || "localhost",
-          port: env.TYPESENSE_PORT || 9000,
+          host: config.host,
+          port: config.port,
           protocol: "http",
         },
       ],
-      apiKey: env.TYPESENSE_ADMIN_KEY,
+      apiKey: config.adminKey,
       connectionTimeoutSeconds: 2,
     });
   }

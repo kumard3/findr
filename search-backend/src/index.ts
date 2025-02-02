@@ -24,13 +24,13 @@ const app = new Hono<{ Bindings: Env; Variables: CustomContext }>();
 
 // Global Middleware
 app.use("*", cors());
-// app.use("*", errorHandler);
-// app.use("*", rateLimiter);
+app.use("*", errorHandler);
+app.use("*", rateLimiter);
 
 // API key validation middleware
 app.use("*", async (c, next) => {
   const apiKey = c.req.header("x-api-key");
-  console.log(apiKey,"apiKey")
+  console.log(apiKey, "apiKey");
   if (!apiKey) {
     throw new HTTPException(401, { message: "API key required" });
   }
@@ -50,7 +50,7 @@ app.use("*", async (c, next) => {
 // Index API
 app.post("/api/index", async (c) => {
   const keyInfo = c.get("keyInfo");
-  const typesense = new TypesenseService(c.env);
+  const typesense = new TypesenseService();
 
   try {
     // Check permissions
@@ -117,7 +117,7 @@ app.post("/api/index", async (c) => {
 // Search API
 app.get("/api/search", async (c) => {
   const keyInfo = c.get("keyInfo");
-  const typesense = new TypesenseService(c.env);
+  const typesense = new TypesenseService();
 
   try {
     const searchParams: SearchParams = {
@@ -166,7 +166,7 @@ app.get("/api/search", async (c) => {
 // Delete document endpoint
 app.delete("/api/documents/:id", async (c) => {
   const keyInfo = c.get("keyInfo");
-  const typesense = new TypesenseService(c.env);
+  const typesense = new TypesenseService();
   const documentId = c.req.param("id");
 
   try {
@@ -214,7 +214,7 @@ app.delete("/api/documents/:id", async (c) => {
 // Collection stats endpoint
 app.get("/api/stats", async (c) => {
   const keyInfo = c.get("keyInfo");
-  const typesense = new TypesenseService(c.env);
+  const typesense = new TypesenseService();
 
   try {
     const stats = await typesense.getCollectionStats(keyInfo.user.id);

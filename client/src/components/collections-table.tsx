@@ -44,33 +44,33 @@ export function CollectionsTable() {
 
   const searchApi = new SearchAPI(env.NEXT_PUBLIC_API_KEY);
 
-  useEffect(() => {
-    const fetchUsage = async () => {
-      try {
-        const usageData = await searchApi.getUsage();
-        setUsage(usageData);
-      } catch (error) {
-        console.error("Error fetching usage:", error);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchUsage = async () => {
+  //     try {
+  //       const usageData = await searchApi.getUsage();
+  //       setUsage(usageData);
+  //     } catch (error) {
+  //       console.error("Error fetching usage:", error);
+  //     }
+  //   };
 
-    fetchUsage();
-  }, []);
+  //   fetchUsage();
+  // }, []);
 
-  const handleNewCollection = async () => {
-    try {
-      await searchApi.generateApiKey({
-        name: "New Collection",
-        type: "admin", // Adding required 'type' field
-        allowedOperations: ["search", "write", "delete"],
-      });
-      // Refresh usage data after creating a new collection
-      const usageData = await searchApi.getUsage();
-      setUsage(usageData);
-    } catch (error) {
-      console.error("Error creating collection:", error);
-    }
-  };
+  // const handleNewCollection = async () => {
+  //   try {
+  //     await searchApi.generateApiKey({
+  //       name: "New Collection",
+  //       type: "admin", // Adding required 'type' field
+  //       allowedOperations: ["search", "write", "delete"],
+  //     });
+  //     // Refresh usage data after creating a new collection
+  //     const usageData = await searchApi.getUsage();
+  //     setUsage(usageData);
+  //   } catch (error) {
+  //     console.error("Error creating collection:", error);
+  //   }
+  // };
 
   const filteredCollections = collections.filter((collection) =>
     collection.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -95,7 +95,7 @@ export function CollectionsTable() {
             className="pl-8"
           />
         </div>
-        <Button onClick={handleNewCollection}>New Collection</Button>
+        {/* <Button onClick={handleNewCollection}>New Collection</Button> */}
       </div>
 
       {usage && (

@@ -81,7 +81,7 @@ const indexDocument = async (document: any) => {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "x-api-key": "sk_0rE-Zc9mR69XibmKZ-lQLtQIujSsKpgo",
+      "x-api-key": "sk_SmzNZ1Bak2zD-Fw5ms-NX9j0zkFq3DSU",
     },
     body: JSON.stringify(movies),
   });

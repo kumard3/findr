@@ -12,7 +12,7 @@ export async function rateLimiter(c: Context, next: Next) {
 
   try {
     const keyInfo = await db.apiKey.findUnique({
-      where: { id: apiKey },
+      where: { value: apiKey },
       include: { user: true },
     });
 
