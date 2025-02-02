@@ -276,6 +276,202 @@ app.get("/api/usage", async (c) => {
   }
 });
 
+// List all collections
+app.get("/api/collections", async (c) => {
+  const keyInfo = c.get("keyInfo");
+  const typesense = new TypesenseService();
+  console.log(keyInfo, "keyInfo");
+  try {
+    const collections = await typesense.client.collections().retrieve();
+    const userCollections = collections.filter((collection) =>
+      collection.name.startsWith(`collection_${keyInfo.user.id}`)
+    );
+
+    await db.usageLog.create({
+      data: {
+        userId: keyInfo.user.id,
+        operation: "list_collections",
+        status: "success",
+        apiKeyId: keyInfo.id,
+        ipAddress: c.req.header("x-forwarded-for"),
+        userAgent: c.req.header("user-agent"),
+      },
+    });
+
+    return c.json(userCollections);
+  } catch (error) {
+    await db.usageLog.create({
+      data: {
+        userId: keyInfo.user.id,
+        operation: "list_collections",
+        status: "failed",
+        errorMessage:
+          error instanceof Error ? error.message : "Failed to list collections",
+        apiKeyId: keyInfo.id,
+        ipAddress: c.req.header("x-forwarded-for"),
+        userAgent: c.req.header("user-agent"),
+      },
+    });
+
+    throw new HTTPException(500, {
+      message:
+        error instanceof Error ? error.message : "Failed to list collections",
+    });
+  }
+});
+
+// List all documents in a collection
+app.get("/api/collections/:collectionName/documents", async (c) => {
+  const keyInfo = c.get("keyInfo");
+  const typesense = new TypesenseService();
+  const collectionName = c.req.param("collectionName");
+
+  try {
+    const documents = await typesense.client
+      .collections(collectionName)
+      .documents()
+      .search({
+        q: "*",
+        per_page: 250,
+      });
+
+    await db.usageLog.create({
+      data: {
+        userId: keyInfo.user.id,
+        operation: "list_documents",
+        status: "success",
+        apiKeyId: keyInfo.id,
+        ipAddress: c.req.header("x-forwarded-for"),
+        userAgent: c.req.header("user-agent"),
+      },
+    });
+
+    return c.json(documents);
+  } catch (error) {
+    await db.usageLog.create({
+      data: {
+        userId: keyInfo.user.id,
+        operation: "list_documents",
+        status: "failed",
+        errorMessage:
+          error instanceof Error ? error.message : "Failed to list documents",
+        apiKeyId: keyInfo.id,
+        ipAddress: c.req.header("x-forwarded-for"),
+        userAgent: c.req.header("user-agent"),
+      },
+    });
+
+    throw new HTTPException(500, {
+      message:
+        error instanceof Error ? error.message : "Failed to list documents",
+    });
+  }
+});
+
+// Delete a collection
+app.delete("/api/collections/:collectionName", async (c) => {
+  const keyInfo = c.get("keyInfo");
+  const typesense = new TypesenseService();
+  const collectionName = c.req.param("collectionName");
+
+  try {
+    if (!keyInfo.allowedOperations.includes("write")) {
+      throw new HTTPException(403, { message: "Write permission required" });
+    }
+
+    await typesense.client.collections(collectionName).delete();
+
+    await db.usageLog.create({
+      data: {
+        userId: keyInfo.user.id,
+        operation: "delete_collection",
+        status: "success",
+        apiKeyId: keyInfo.id,
+        ipAddress: c.req.header("x-forwarded-for"),
+        userAgent: c.req.header("user-agent"),
+      },
+    });
+
+    return c.json({ success: true });
+  } catch (error) {
+    await db.usageLog.create({
+      data: {
+        userId: keyInfo.user.id,
+        operation: "delete_collection",
+        status: "failed",
+        errorMessage:
+          error instanceof Error
+            ? error.message
+            : "Failed to delete collection",
+        apiKeyId: keyInfo.id,
+        ipAddress: c.req.header("x-forwarded-for"),
+        userAgent: c.req.header("user-agent"),
+      },
+    });
+
+    throw new HTTPException(500, {
+      message:
+        error instanceof Error ? error.message : "Failed to delete collection",
+    });
+  }
+});
+
+// Delete multiple documents
+app.delete("/api/collections/:collectionName/documents", async (c) => {
+  const keyInfo = c.get("keyInfo");
+  const typesense = new TypesenseService();
+  const collectionName = c.req.param("collectionName");
+
+  try {
+    if (!keyInfo.allowedOperations.includes("write")) {
+      throw new HTTPException(403, { message: "Write permission required" });
+    }
+
+    const { documentIds } = await c.req.json();
+    if (!Array.isArray(documentIds)) {
+      throw new HTTPException(400, { message: "documentIds must be an array" });
+    }
+
+    const deletePromises = documentIds.map((id) =>
+      typesense.client.collections(collectionName).documents(id).delete()
+    );
+
+    await Promise.all(deletePromises);
+
+    await db.usageLog.create({
+      data: {
+        userId: keyInfo.user.id,
+        operation: "bulk_delete_documents",
+        status: "success",
+        apiKeyId: keyInfo.id,
+        documentsProcessed: documentIds.length,
+        ipAddress: c.req.header("x-forwarded-for"),
+        userAgent: c.req.header("user-agent"),
+      },
+    });
+
+    return c.json({ success: true, deletedCount: documentIds.length });
+  } catch (error) {
+    await db.usageLog.create({
+      data: {
+        userId: keyInfo.user.id,
+        operation: "bulk_delete_documents",
+        status: "failed",
+        errorMessage:
+          error instanceof Error ? error.message : "Failed to delete documents",
+        apiKeyId: keyInfo.id,
+        ipAddress: c.req.header("x-forwarded-for"),
+        userAgent: c.req.header("user-agent"),
+      },
+    });
+
+    throw new HTTPException(500, {
+      message:
+        error instanceof Error ? error.message : "Failed to delete documents",
+    });
+  }
+});
+
 const port = Bun.env.PORT || 8000;
 Bun.serve({
   port,

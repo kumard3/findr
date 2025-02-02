@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 import { SearchAPI } from "@/lib/api";
 import { env } from "@/env";
+import { api } from "@/utils/api";
 
 type Collection = {
   id: string;
@@ -42,8 +43,8 @@ export function CollectionsTable() {
   } | null>(null);
   const itemsPerPage = 10;
 
-  const searchApi = new SearchAPI(env.NEXT_PUBLIC_API_KEY);
-
+  const {data:collectionData} = api.collection.getCollections.useQuery()
+console.log(collectionData,"collectionData")
   // useEffect(() => {
   //   const fetchUsage = async () => {
   //     try {

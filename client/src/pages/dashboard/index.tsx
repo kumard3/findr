@@ -7,9 +7,9 @@ export default function Page() {
 
   return (
     <DashboardLayout>
-      <Button onClick={signOut}>
+      {/* <Button onClick={signOut}>
         Sign Out
-      </Button>
+      </Button> */}
       <CollectionsTable />
     </DashboardLayout>
   );
