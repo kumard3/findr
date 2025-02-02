@@ -122,7 +122,7 @@ app.get("/api/search", async (c) => {
       page: Number.parseInt(c.req.query("page") || "1"),
       collection_name: c.req.query("collection_name") || "default",
     };
-
+    console.log(searchParams)
     const results = await typesense.search(keyInfo.user.id, searchParams);
 
     // Log search

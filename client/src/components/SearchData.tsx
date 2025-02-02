@@ -103,8 +103,9 @@ import { useState } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 
-const API_KEY = "sk_h9sfDd1CIJYpSt9_x1bL3oU4VNghU1vP";
-const API_URL = "https://api.kumard3.in"; // e.g., "http://localhost:8108"
+const API_KEY = "sk_0rE-Zc9mR69XibmKZ-lQLtQIujSsKpgo";
+// const API_URL = "https://api.kumard3.in"; // e.g., "http://localhost:8108"
+const API_URL = "http://localhost:9000"; // e.g., "http://localhost:8108"
 
 const SearchData = () => {
   const [searchQuery, setSearchQuery] = useState("");
