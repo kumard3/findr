@@ -15,7 +15,7 @@ export const collectionRouter = createTRPCRouter({
 				},
 			});
 			const search = new SearchAPI(getUserAPIKey[0]?.value || "");
-			const collections = await search.getCollections();
+			const collections = await search.getDocuments();
 			return collections;
 		}),
 });

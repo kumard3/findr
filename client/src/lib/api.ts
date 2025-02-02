@@ -199,6 +199,25 @@ export class SearchAPI {
 			return { error: { message: "Failed to fetch collections" } };
 		}
 	}
+	async getDocuments(): Promise<ApiResponse<unknown>> {
+		// await this.validateApiKey();
+		try {
+			const response = await fetch(`${SEARCH_API_URL}/api/documents`, {
+				headers: this.getHeaders(),
+			});
+
+			// if (!response.ok) {
+			//   console.error("Failed to fetch collections:", response.statusText);
+			//   throw new Error("Failed to fetch collections");
+			// }
+			const data = await response.json();
+			console.log("data", data);
+			return data;
+		} catch (error) {
+			console.error("Error fetching collections:", error);
+			return { error: { message: "Failed to fetch collections" } };
+		}
+	}
 
 	async deleteCollection(collectionId: string): Promise<{ success: boolean }> {
 		// await this.validateApiKey();
