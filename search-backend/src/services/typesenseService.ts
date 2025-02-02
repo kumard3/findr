@@ -1,19 +1,46 @@
 import { Client } from "typesense";
 import type { SearchParams, IndexError, Env } from "../types";
+import { z } from "zod";
+import { db } from "../db";
+
+const MAX_DOCUMENT_SIZE = 100000; // 100KB per document
+
+const documentValidation = z
+  .record(z.string(), z.any())
+  .refine(
+    (doc) => JSON.stringify(doc).length <= MAX_DOCUMENT_SIZE,
+    `Individual document size exceeds ${MAX_DOCUMENT_SIZE / 1000}KB limit`
+  );
+
+const DocumentSchema = z.union([
+  documentValidation,
+  z.array(documentValidation),
+]);
+
+const UsageSchema = z.object({
+  documentsProcessed: z.number(),
+  dataSize: z.number(),
+  requestCount: z.number(),
+  storageUsed: z.number(),
+});
 
 export class TypesenseService {
-  private client: Client;
+  private _client: Client;
+
+  public get client(): Client {
+    return this._client;
+  }
 
   constructor(env: Env) {
-    this.client = new Client({
+    this._client = new Client({
       nodes: [
         {
-          host: "localhost",
-          port: 8108,
+          host: env.TYPESENSE_HOST || "localhost",
+          port: env.TYPESENSE_PORT || 9000,
           protocol: "http",
         },
       ],
-      apiKey: "xyz",
+      apiKey: env.TYPESENSE_ADMIN_KEY,
       connectionTimeoutSeconds: 2,
     });
   }
@@ -24,7 +51,6 @@ export class TypesenseService {
       return await this.client.collections(collectionName).retrieve();
     } catch (error) {
       // Create collection with dynamic schema
-
       return await this.client.collections().create({
         name: collectionName,
         fields: [
@@ -38,8 +64,10 @@ export class TypesenseService {
     }
   }
 
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-  async indexDocument(userId: string, document: any) {
+  async indexDocument(
+    userId: string,
+    document: z.infer<typeof DocumentSchema>
+  ) {
     try {
       await this.createOrGetCollection(userId);
       const collection = this.client.collections(`collection_${userId}`);
@@ -50,17 +78,40 @@ export class TypesenseService {
         ...doc,
         user_id: userId,
         indexed_at: Date.now(),
-        // Preserve original id if exists, otherwise generate one
         id:
           doc.id?.toString() ||
           `${userId}_${Date.now()}_${Math.random().toString(36).slice(2)}`,
       }));
 
-      // Use import for better performance
-      return await collection.documents().import(enrichedDocuments, {
-        action: "create",
-        dirty_values: "coerce_or_reject",
+      const indexedDoc = await collection
+        .documents()
+        .import(enrichedDocuments, {
+          action: "create",
+          dirty_values: "coerce_or_reject",
+        });
+
+      const documentSize = Buffer.byteLength(JSON.stringify(document), "utf8");
+
+      await db.user.update({
+        where: { id: userId },
+        data: {
+          used: { increment: 1 },
+          storage: { increment: documentSize },
+        },
       });
+
+      await db.usageLog.create({
+        data: {
+          userId,
+          operation: "index",
+          status: "success",
+          documentsProcessed: 1,
+          dataSize: documentSize,
+          processingTime: 0,
+        },
+      });
+
+      return indexedDoc;
     } catch (error) {
       const indexError: IndexError = new Error(
         error instanceof Error ? error.message : "Index error"
@@ -89,7 +140,6 @@ export class TypesenseService {
     try {
       return await this.client.collections(`collection_${userId}`).delete();
     } catch (error) {
-      // Ignore if collection doesn't exist
       return null;
     }
   }

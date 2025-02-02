@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import { Button } from "@/components/ui/button";
 
 const Hero = () => {
@@ -16,12 +16,8 @@ const Hero = () => {
           </p>
         </div>
         <div className="flex gap-4 text-base font-normal mt-8">
-          <Button className="bg-black text-white border-black hover:bg-white hover:text-black transition-colors">
-            Get Started
-          </Button>
-          <Button variant="outline" className="border-black text-black hover:bg-black hover:text-white transition-colors">
-            Learn More
-          </Button>
+          <Button>Get Started</Button>
+          <Button variant="outline">Learn More</Button>
         </div>
       </div>
       <img

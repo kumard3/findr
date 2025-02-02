@@ -1,5 +1,6 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
+import { PricingTable } from "../pricing";
 
 const Pricing = () => {
   return (
@@ -80,6 +81,7 @@ const Pricing = () => {
           alt="Pricing illustration"
         />
       </div>
+      <PricingTable />
     </section>
   );
 };

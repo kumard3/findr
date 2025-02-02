@@ -4,24 +4,36 @@ import { env } from "@/env";
 import { TRPCClientError } from "@trpc/client";
 import typesense from "@/lib/typesense";
 import bcrypt from "bcryptjs";
+import { nanoid } from "nanoid";
+
 const createApiKeySchema = z.object({
   name: z.string().min(1).max(100),
   type: z.enum(["search", "write", "admin"]),
   expiresIn: z.number().optional(), // days
   allowedOperations: z.array(z.enum(["search", "write", "delete"])),
   ipRestrictions: z.array(z.string()).optional(),
+  permissions: z.array(z.enum(["search", "write", "delete"])).optional(),
 });
+
 export const userRouter = createTRPCRouter({
   getAllUsers: publicProcedure.query(async ({ ctx }) => {
-    const userData = await ctx.db.user.findMany({});
+    const userData = await ctx.db.user.findMany({
+      include: {
+        apiKeys: true,
+        usageLogs: {
+          orderBy: { createdAt: "desc" },
+          take: 10,
+        },
+      },
+    });
     return userData;
   }),
+
   createUser: publicProcedure
     .input(
       z.object({
-        email: z.string(),
-
-        password: z.string(),
+        email: z.string().email(),
+        password: z.string().min(8),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -31,208 +43,138 @@ export const userRouter = createTRPCRouter({
         data: {
           email: email.toLowerCase(),
           password: hashedPassword,
-
-          // Add any other initial user data
+          limit: 1000, // Default limit
+          used: 0,
+          storage: 0,
         },
       });
       return newUser;
     }),
-  generateApiKey: publicProcedure
-    .input(
-      z.object({
-        userId: z.string(),
-      })
-    )
+
+  generateApiKey: protectedProcedure
+    .input(createApiKeySchema)
     .mutation(async ({ ctx, input }) => {
-      const { userId } = input;
+      const { name, type, allowedOperations, ipRestrictions, expiresIn } =
+        input;
+      const userId = ctx.session?.user?.id;
+
       if (!userId) {
-        return new TRPCClientError("User ID is required");
+        throw new TRPCClientError("User not authenticated");
       }
 
-      const apiKey = Buffer.from(`${userId}:${Date.now()}`).toString("base64"); // Simple key generation
-
-      await ctx.db.user.update({
-        where: { id: userId },
+      const keyId = nanoid(32);
+      const apiKey = await ctx.db.apiKey.create({
         data: {
-          apiKeys: {},
+          value: keyId, // Add required 'value' field
+          id: keyId,
+          name,
+          type,
+          userId,
+          permissions: allowedOperations,
+          ipRestrictions: ipRestrictions || [],
+          expiresAt: expiresIn
+            ? new Date(Date.now() + expiresIn * 86400000)
+            : null,
+          rateLimit: type === "admin" ? 1000 : 100,
+          requestCount: 0,
         },
       });
+
+      return apiKey;
     }),
-  // indexData: protectedProcedure
-  //   .input(
-  //     z.object({
-  //       apiKey: z.string(),
-  //       content: z.string(),
-  //     })
-  //   )
-  //   .mutation(async ({ ctx, input }) => {
-  //     const { apiKey, content } = input;
-  //     if (!apiKey || !content) {
-  //       return new TRPCClientError("API key and content are required");
-  //     }
 
-  //     const user = await ctx.db.user.findUnique({ where: { apiKey } });
-  //     if (!user) {
-  //       return new TRPCClientError("Invalid API key");
-  //     }
+  validateApiKey: protectedProcedure
+    .input(z.object({ keyId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const apiKey = await ctx.db.apiKey.findUnique({
+        where: { id: input.keyId },
+        include: { user: true },
+      });
 
-  //     const document = await ctx.db.document.create({
-  //       data: { userId: user.id, content },
-  //     });
+      if (!apiKey) {
+        throw new TRPCClientError("Invalid API key");
+      }
 
-  //     // Index in Typesense
-  //     await typesense.collections("documents").documents().create({
-  //       id: document.id,
-  //       userId: user.id,
-  //       content,
-  //     });
-  //   }),
-  // indexData: publicProcedure
-  //   .input(
-  //     z.object({
-  //       apiKey: z.string(),
-  //       data: z.any().array(),
-  //     })
-  //   )
-  //   .mutation(async ({ ctx, input }) => {
-  //     const { apiKey, data } = input;
+      if (apiKey.requestCount >= apiKey.rateLimit) {
+        throw new TRPCClientError("Rate limit exceeded");
+      }
 
-  //     // Validate API key
-  //     const user = await ctx.db.user.findUnique({ where: { apiKey } });
-  //     if (!user) {
-  //       throw new Error("Invalid API key");
-  //     }
+      await ctx.db.apiKey.update({
+        where: { id: input.keyId },
+        data: { requestCount: { increment: 1 } },
+      });
 
-  //     const collectionName = `documen-${user.id}`;
+      return {
+        id: apiKey.id,
+        userId: apiKey.userId,
+        permissions: apiKey.permissions,
+        rateLimit: apiKey.rateLimit,
+        requestCount: apiKey.requestCount + 1,
+      };
+    }),
 
-  //     // Ensure the Typesense collection exists dynamically
-  //     await ensureCollectionExists(collectionName);
-  //     // const documents = [];
-  //     // for (const doc of data) {
-  //     //   documents.push({
-  //     //     id: doc.id.toString() || `${user.id}-${Date.now()}`, // Generate unique ID if not provided
-  //     //     ...doc,
-  //     //   });
-  //     // }
-  //     // Prepare documents for indexing
-  //     const documents = data.map((doc) => ({
-  //       ...doc,
-  //       id: String(doc.id) || `${user.id}-${Date.now()}`,
-  //     }));
-  //     console.log("first", documents);
-  //     // Index documents in Typesense
-  //     try {
-  //       const result = await typesense
-  //         .collections(collectionName)
-  //         .documents()
-  //         // .import(data, {
-  //         //   action: "upsert", // Use upsert to update existing records or insert new ones
-  //         // });
-  //         .import(documents, {
-  //           action: "upsert",
-  //           batch_size: 1000,
-  //         });
+  getUserStats: protectedProcedure.query(async ({ ctx }) => {
+    const userId = ctx.session?.user?.id;
+    if (!userId) {
+      throw new TRPCClientError("User not authenticated");
+    }
 
-  //       console.log("Indexing result:", result);
-  //       return { success: true, message: "Data indexed successfully." };
-  //     } catch (error) {
-  //       console.error("Error indexing documents:", error);
-  //       // console.error("Error indexing documents:", error.importResults);
-  //       throw new Error("Failed to index documents.");
-  //     }
-  //   }),
-  // // searchData: protectedProcedure
-  // //   .input(
-  // //     z.object({
-  // //       apiKey: z.string(),
-  // //       query: z.string(),
-  // //     })
-  // //   )
-  // //   .query(async ({ ctx, input }) => {
-  // //     const { apiKey, query } = input;
+    const [user, usageLogs, apiKeys] = await Promise.all([
+      ctx.db.user.findUnique({
+        where: { id: userId },
+        select: { used: true, storage: true, limit: true },
+      }),
+      ctx.db.usageLog.findMany({
+        where: { userId },
+        orderBy: { createdAt: "desc" },
+        take: 100,
+      }),
+      ctx.db.apiKey.findMany({
+        where: { userId },
+        orderBy: { createdAt: "desc" },
+      }),
+    ]);
 
-  // //     if (!apiKey || !query) {
-  // //       return new TRPCClientError("API key and query are required");
-  // //     }
+    const stats = await ctx.db.usageLog.groupBy({
+      by: ["operation", "status"],
+      where: { userId },
+      _count: true,
+    });
 
-  // //     const user = await ctx.db.user.findUnique({ where: { apiKey } });
-  // //     if (!user) {
-  // //       return new TRPCClientError("Invalid API key");
-  // //     }
+    return {
+      user,
+      usageLogs,
+      apiKeys,
+      stats,
+    };
+  }),
 
-  // //     // Search in Typesense with filter by userId
-  // //     const results = await typesense
-  // //       .collections("documents")
-  // //       .documents()
-  // //       .search({
-  // //         q: query as string,
-  // //         query_by: "content",
-  // //         filter_by: `userId:${user.id}`,
-  // //       });
+  deleteApiKey: protectedProcedure
+    .input(z.object({ keyId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.session?.user?.id;
+      if (!userId) {
+        throw new TRPCClientError("User not authenticated");
+      }
 
-  // //     return results;
-  // //   }),
-  // searchData: publicProcedure
-  //   .input(
-  //     z.object({
-  //       apiKey: z.string(),
-  //       query: z.string(),
-  //       filters: z.record(z.string()).optional(), // Optional filters for metadata fields
-  //     })
-  //   )
-  //   .query(async ({ ctx, input }) => {
-  //     const { apiKey, query, filters } = input;
+      await ctx.db.apiKey.delete({
+        where: {
+          id: input.keyId,
+          userId, // Ensure the key belongs to the user
+        },
+      });
 
-  //     // Validate API key
-  //     const user = await ctx.db.user.findUnique({ where: { apiKey } });
-  //     if (!user) {
-  //       throw new Error("Invalid API key");
-  //     }
-
-  //     const collectionName = `documen-cm55l5np30000vacn9z9acvt3`;
-
-  //     // Build filter query for Typesense
-  //     // Build filter query for Typesense
-  //     let filterBy = `userId:${user.id}`;
-  //     if (filters) {
-  //       Object.entries(filters).forEach(([key, value]) => {
-  //         filterBy += ` && ${key}:${value}`;
-  //       });
-  //     }
-
-  //     // Search in Typesense with query and filters
-  //     try {
-  //       const coll = await typesense.collections(collectionName).retrieve();
-  //       const results = await typesense
-  //         .collections(collectionName)
-  //         .documents()
-  //         .search({
-  //           q: query,
-
-  //           query_by: "*", // Search across all fields
-  //           prefix: true,
-  //           prioritize_num_matching_fields: true,
-  //         });
-
-  //       return results;
-  //     } catch (error) {
-  //       console.error("Error searching documents:", error);
-  //       throw new Error("Failed to search documents.");
-  //     }
-  //   }),
+      return { success: true };
+    }),
 });
 
 async function ensureCollectionExists(collectionName: string) {
   try {
-    // Check if the collection already exists
     const collections = await typesense.collections().retrieve();
     const collectionExists = collections.some(
       (collection) => collection.name === collectionName
     );
-    // console.log(collections, "collections");
-    // console.log(collectionExists, "collectionExists");
     if (!collectionExists) {
-      // Create a new collection with a dynamic schema
       await typesense.collections().create({
         name: collectionName,
         fields: [{ name: ".*", type: "auto" }],

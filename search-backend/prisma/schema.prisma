@@ -56,8 +56,12 @@ model ApiKey {
     expiresAt DateTime?
     lastUsed  DateTime?
 
+    // Rate Limiting
+    rateLimit         Int      @default(100) // Requests per minute
+    requestCount      Int      @default(0) // Current request count
+    allowedOperations String[]
     // Permissions
-    allowedOperations String[] // search, write, delete
+    permissions       String[] // search, write, delete
     ipRestrictions    String[] // Allowed IP addresses
 
     @@index([value])
@@ -111,6 +115,8 @@ model UsageLog {
     apiKeyId  String?
     ipAddress String?
     userAgent String?
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 
     @@index([userId])
     @@index([collectionId])

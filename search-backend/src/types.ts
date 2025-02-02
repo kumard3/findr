@@ -9,6 +9,32 @@ export interface Env {
   DATABASE_URL: string;
 }
 
+export interface ApiKeyInfo {
+  id: string;
+  userId: string;
+  permissions: string[];
+  rateLimit: number;
+  requestCount: number;
+}
+
+export interface UsageMetrics {
+  documentsProcessed?: number;
+  processingTime?: number;
+  dataSize?: number;
+}
+
+export interface IndexResponse {
+  success: boolean;
+  document: unknown;
+  usage: UsageResponse;
+}
+
+export interface UsageResponse {
+  used: number;
+  limit: number;
+  storage: number;
+}
+
 export interface ApiKeyWithUser extends ApiKey {
   user: User;
 }
@@ -80,6 +106,32 @@ export interface Env {
   TYPESENSE_HOST: string;
   TYPESENSE_PORT: number;
   DATABASE_URL: string;
+}
+
+export interface ApiKeyInfo {
+  id: string;
+  userId: string;
+  permissions: string[];
+  rateLimit: number;
+  requestCount: number;
+}
+
+export interface UsageMetrics {
+  documentsProcessed?: number;
+  processingTime?: number;
+  dataSize?: number;
+}
+
+export interface IndexResponse {
+  success: boolean;
+  document: unknown;
+  usage: UsageResponse;
+}
+
+export interface UsageResponse {
+  used: number;
+  limit: number;
+  storage: number;
 }
 
 export interface ApiKeyInfo {

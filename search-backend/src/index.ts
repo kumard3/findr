@@ -3,6 +3,8 @@ import { cors } from "hono/cors";
 import { HTTPException } from "hono/http-exception";
 import { ApiKeyValidator } from "./services/apiKeyValidator";
 import { TypesenseService } from "./services/typesenseService";
+import { rateLimiter } from "./middleware/rateLimiter";
+import { errorHandler } from "./middleware/errorHandler";
 
 import { documentSchema, type Env, type SearchParams } from "./types";
 import { db } from "./db";
@@ -20,12 +22,15 @@ interface CustomContext {
 
 const app = new Hono<{ Bindings: Env; Variables: CustomContext }>();
 
-// Middleware
+// Global Middleware
 app.use("*", cors());
+// app.use("*", errorHandler);
+// app.use("*", rateLimiter);
 
 // API key validation middleware
 app.use("*", async (c, next) => {
   const apiKey = c.req.header("x-api-key");
+  console.log(apiKey,"apiKey")
   if (!apiKey) {
     throw new HTTPException(401, { message: "API key required" });
   }
@@ -158,37 +163,119 @@ app.get("/api/search", async (c) => {
     });
   }
 });
-// app.get("/image", async (c) => {
-//   const { width, height, quality, format, url } = c.req.query();
+// Delete document endpoint
+app.delete("/api/documents/:id", async (c) => {
+  const keyInfo = c.get("keyInfo");
+  const typesense = new TypesenseService(c.env);
+  const documentId = c.req.param("id");
 
-//   try {
-//     const imageResponse = await fetch(url);
-//     const imageBuffer = await imageResponse.arrayBuffer();
+  try {
+    if (!keyInfo.allowedOperations.includes("write")) {
+      throw new HTTPException(403, { message: "Write permission required" });
+    }
 
-//     const transformer = sharp(Buffer.from(imageBuffer))
-//       .resize(
-//         width ? Number.parseInt(width) : undefined,
-//         height ? Number.parseInt(height) : undefined,
-//         { fit: "inside" }
-//       )
-//       .toFormat("webp", {
-//         compressionLevel: 6,
-//       });
+    await typesense.client
+      .collections(`collection_${keyInfo.user.id}`)
+      .documents(documentId)
+      .delete();
 
-//     // if (quality) {
-//     //   transformer = transformer.quality(parseInt(quality));
-//     // }
+    await db.usageLog.create({
+      data: {
+        userId: keyInfo.user.id,
+        operation: "delete",
+        status: "success",
+        apiKeyId: keyInfo.id,
+        documentsProcessed: 1,
+        ipAddress: c.req.header("x-forwarded-for"),
+        userAgent: c.req.header("user-agent"),
+      },
+    });
 
-//     const processedImage = await transformer.toBuffer();
+    return c.json({ success: true });
+  } catch (error) {
+    await db.usageLog.create({
+      data: {
+        userId: keyInfo.user.id,
+        operation: "delete",
+        status: "failed",
+        errorMessage: error instanceof Error ? error.message : "Delete failed",
+        apiKeyId: keyInfo.id,
+        ipAddress: c.req.header("x-forwarded-for"),
+        userAgent: c.req.header("user-agent"),
+      },
+    });
 
-//     c.header("Content-Type", `image/${format || "webp"}`);
-//     c.header("Cache-Control", "public, max-age=31536000");
+    throw new HTTPException(500, {
+      message: error instanceof Error ? error.message : "Delete failed",
+    });
+  }
+});
 
-//     return c.body(processedImage);
-//   } catch (error) {
-//     return c.json({ error: "Image processing failed" }, 500);
-//   }
-// });
+// Collection stats endpoint
+app.get("/api/stats", async (c) => {
+  const keyInfo = c.get("keyInfo");
+  const typesense = new TypesenseService(c.env);
+
+  try {
+    const stats = await typesense.getCollectionStats(keyInfo.user.id);
+    const usage = await db.user.findUnique({
+      where: { id: keyInfo.user.id },
+      select: { used: true, storage: true, limit: true },
+    });
+
+    return c.json({
+      collection: stats,
+      usage: usage || { used: 0, storage: 0, limit: 0 },
+    });
+  } catch (error) {
+    throw new HTTPException(500, {
+      message: error instanceof Error ? error.message : "Failed to get stats",
+    });
+  }
+});
+
+// Usage statistics endpoint
+app.get("/api/usage", async (c) => {
+  const keyInfo = c.get("keyInfo");
+
+  try {
+    // Get usage logs
+    const logs = await db.usageLog.findMany({
+      where: { userId: keyInfo.user.id },
+      orderBy: { createdAt: "desc" },
+      take: 100, // Limit to last 100 entries
+    });
+
+    // Get aggregated stats
+    const stats = await db.usageLog.groupBy({
+      by: ["operation", "status"],
+      where: { userId: keyInfo.user.id },
+      _count: true,
+    });
+
+    // Get user limits and current usage
+    const user = await db.user.findUnique({
+      where: { id: keyInfo.user.id },
+      select: {
+        used: true,
+        storage: true,
+        limit: true,
+      },
+    });
+
+    return c.json({
+      logs,
+      stats,
+      limits: user || { used: 0, storage: 0, limit: 0 },
+    });
+  } catch (error) {
+    throw new HTTPException(500, {
+      message:
+        error instanceof Error ? error.message : "Failed to fetch usage data",
+    });
+  }
+});
+
 const port = Bun.env.PORT || 8000;
 Bun.serve({
   port,

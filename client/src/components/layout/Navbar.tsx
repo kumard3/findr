@@ -45,15 +45,19 @@ const Navbar = () => {
 
   const AuthButtons = () => (
     <div className="flex items-center gap-4 justify-center">
-      <Button
-        variant="outline"
-        className="border-black text-black hover:bg-black hover:text-white transition-colors"
-      >
-        Join
-      </Button>
-      <Button className="bg-black text-white border-black hover:bg-white hover:text-black transition-colors">
-        Sign Up
-      </Button>
+      <Link href={"/auth/signup"}>
+        <Button
+          variant="outline"
+          className="border-black text-black hover:bg-black hover:text-white transition-colors"
+        >
+          Join
+        </Button>
+      </Link>
+      <Link href={"/auth/login"}>
+        <Button className="bg-black text-white border-black hover:bg-white hover:text-black transition-colors">
+          Sign Up
+        </Button>
+      </Link>
     </div>
   );
 
@@ -71,11 +75,6 @@ const Navbar = () => {
 
         {!isMobile ? (
           <div className="flex items-center gap-8 text-base font-normal justify-center flex-wrap">
-            <NavigationMenu>
-              <NavigationMenuList>
-                <NavItems />
-              </NavigationMenuList>
-            </NavigationMenu>
             <AuthButtons />
           </div>
         ) : (
@@ -91,11 +90,6 @@ const Navbar = () => {
             </SheetTrigger>
             <SheetContent side="right" className="w-[300px] sm:w-[400px]">
               <div className="flex flex-col gap-8 mt-8">
-                <NavigationMenu orientation="vertical">
-                  <NavigationMenuList className="flex-col items-start gap-4">
-                    <NavItems />
-                  </NavigationMenuList>
-                </NavigationMenu>
                 <div className="flex flex-col gap-4">
                   <AuthButtons />
                 </div>

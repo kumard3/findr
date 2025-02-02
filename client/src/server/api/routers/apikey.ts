@@ -7,7 +7,7 @@ import { nanoid } from "nanoid";
 const createApiKeySchema = z.object({
   name: z.string().min(1).max(100),
   type: z.enum(["search", "write", "admin"]),
-  expiresIn: z.number().optional(), // days
+  expiresIn: z.number().optional(),
   allowedOperations: z.array(z.enum(["search", "write", "delete"])),
   ipRestrictions: z.array(z.string()).optional(),
 });
@@ -17,30 +17,7 @@ export const apiKeyRouter = createTRPCRouter({
     .input(createApiKeySchema)
     .mutation(async ({ ctx, input }) => {
       const { session } = ctx;
-    //   await ctx.db.tier.createMany({
-    //     data: [
-    //       {
-    //         name: "free",
-    //         price: 0,
-    //         documentLimit: 1000,
-    //         storageLimit: 100000000, // 100MB in bytes
-    //         searchesPerDay: 100,
-    //         apiKeys: 2,
-    //         collections: 1,
-    //         features: ["search", "basic_indexing"]
-    //       },
-    //       {
-    //         name: "pro",
-    //         price: 29.99,
-    //         documentLimit: 10000,
-    //         storageLimit: 1000000000, // 1GB in bytes
-    //         searchesPerDay: 1000,
-    //         apiKeys: 5,
-    //         collections: 5,
-    //         features: ["search", "advanced_indexing", "analytics"]
-    //       }
-    //     ]
-    //   });
+
       // Check user's tier limits
       const user = await ctx.db.user.findUnique({
         where: { id: session.user.id },
@@ -58,25 +35,25 @@ export const apiKeyRouter = createTRPCRouter({
         });
       }
 
-      // Get tier limits
-      const tierLimits = await ctx.db.tier.findUnique({
-        where: { name: user.tier },
-      });
+      // // Get tier limits
+      // const tierLimits = await ctx.db.tier.findUnique({
+      //   where: { name: user.tier },
+      // });
 
-      if (!tierLimits) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Tier not found",
-        });
-      }
+      // if (!tierLimits) {
+      //   throw new TRPCError({
+      //     code: "NOT_FOUND",
+      //     message: "Tier not found",
+      //   });
+      // }
 
       // Check API key limit
-      if (user._count.apiKeys >= tierLimits.apiKeys) {
-        throw new TRPCError({
-          code: "FORBIDDEN",
-          message: `API key limit reached for ${user.tier} tier`,
-        });
-      }
+      // if (user._count.apiKeys >= tierLimits.apiKeys) {
+      //   throw new TRPCError({
+      //     code: "FORBIDDEN",
+      //     message: `API key limit reached for ${user.tier} tier`,
+      //   });
+      // }
 
       // Generate API key
       const apiKey = await ctx.db.apiKey.create({
@@ -91,12 +68,15 @@ export const apiKeyRouter = createTRPCRouter({
           expiresAt: input.expiresIn
             ? new Date(Date.now() + input.expiresIn * 24 * 60 * 60 * 1000)
             : null,
+          rateLimit: input.type === "admin" ? 1000 : 100,
+          requestCount: 0,
+          lastUsed: new Date(),
         },
       });
 
       return {
         id: apiKey.id,
-        value: apiKey.value, // Only show value once
+        value: apiKey.value,
         name: apiKey.name,
         type: apiKey.type,
         createdAt: apiKey.createdAt,
@@ -121,6 +101,8 @@ export const apiKeyRouter = createTRPCRouter({
         expiresAt: true,
         lastUsed: true,
         allowedOperations: true,
+        requestCount: true,
+        rateLimit: true,
       },
       orderBy: {
         createdAt: "desc",
