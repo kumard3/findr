@@ -14,7 +14,8 @@ import {
 } from "./types";
 import { db } from "./db";
 import { randomUUID } from "crypto";
-
+import { z } from "zod";
+import fs from "fs";
 // Define custom context for Hono variables
 interface CustomContext {
   keyInfo: ApiKeyInfo;
@@ -30,7 +31,6 @@ app.use("*", errorHandler);
 app.use("*", async (c, next) => {
   const apiKey = c.req.header("x-api-key");
   console.log(apiKey, "apiKey");
-  console.log(c.req, "c.req");
   if (!apiKey) throw new HTTPException(401, { message: "API key required" });
 
   const validator = new ApiKeyValidator();
@@ -39,71 +39,120 @@ app.use("*", async (c, next) => {
   await next();
 });
 
-// Endpoint: Index a Single Document
+// Define schemas for validation
+
+// Updated /api/index endpoint
 app.post("/api/index", async (c) => {
-  const { keyInfo } = c.var;
-  console.log(keyInfo, "keyInfo");
-  if (!keyInfo.permissions.includes("write")) {
-    throw new HTTPException(403, { message: "Write permission required" });
-  }
-
-  const rawDocument = await c.req.json();
-  const document = await documentSchema.parseAsync(rawDocument); // Type: { content: string }
-
-  // Generate a unique ID for the document
-  const documentId = randomUUID();
-  const typesenseDoc = {
-    id: documentId,
-    content: document.content,
-  };
-  const documentSize = Buffer.byteLength(JSON.stringify(typesenseDoc), "utf8");
-
-  // Check usage limits
-  const user = await db.user.findUniqueOrThrow({
-    where: { id: keyInfo.userId },
-    include: { tier: true },
-  });
-  if (
-    user.used >= (user.tier?.documentLimit || 1000) ||
-    user.storage + documentSize > (user.tier?.storageLimit || 10485760)
-  ) {
-    throw new HTTPException(403, { message: "Usage limit exceeded" });
-  }
-
-  // Save to primary database
-  await db.document.create({
-    data: {
-      id: documentId,
-      userId: keyInfo.userId,
-      content: document.content,
-    },
-  });
-
-  // Index in Typesense
+  const keyInfo = c.get("keyInfo");
   const typesense = new TypesenseService();
-  await typesense.indexDocument(keyInfo.userId, typesenseDoc);
+  const rawDocument = await c.req.json();
+  let documents: z.infer<typeof documentSchema>[];
+  let isBulk = false;
+  try {
+    // Check permissions
+    if (!keyInfo.permissions.includes("write")) {
+      throw new HTTPException(403, { message: "Write permission required" });
+    }
 
-  // Update usage logs and user metrics
-  await db.$transaction([
-    db.usageLog.create({
+
+    if (Array.isArray(rawDocument)) {
+      documents = await bulkDocumentSchema.parseAsync(rawDocument);
+      isBulk = true;
+    } else {
+      const singleDoc = await documentSchema.parseAsync(rawDocument);
+      documents = [singleDoc];
+    }
+
+    // Generate IDs and prepare documents for indexing
+    const typesenseDocs = documents.map((doc) => ({
+      id: randomUUID(),
+      content: doc.content,
+    }));
+    console.log(typesenseDocs, "typesenseDocs");
+    // Calculate total size and document count
+    const totalSize = typesenseDocs.reduce(
+      (sum, doc) => sum + Buffer.byteLength(JSON.stringify(doc), "utf8"),
+      0
+    );
+    const docCount = typesenseDocs.length;
+
+    // Fetch user with tier info for usage limits
+    const user = await db.user.findUnique({
+      where: { id: keyInfo.userId },
+      include: { tier: true },
+    });
+    console.log(user, "user");
+    // Check usage limits
+    const tier = user?.tier || { documentLimit: 1000, storageLimit: 10485760 }; // Default limits
+    if (
+      user?.used + docCount > tier.documentLimit ||
+      user?.storage + totalSize > tier.storageLimit
+    ) {
+      throw new HTTPException(403, { message: "Usage limit exceeded" });
+    }
+
+    // Save to primary database
+    await db.document.createMany({
+      data: typesenseDocs.map((doc) => ({
+        id: doc.id,
+        userId: keyInfo.userId,
+        content: doc.content,
+      })),
+    });
+
+    // Index document(s) in Typesense
+    await typesense.indexDocument(keyInfo.userId, typesenseDocs);
+
+    // Log operation and update user usage in a transaction
+    await db.$transaction([
+      db.usageLog.create({
+        data: {
+          userId: keyInfo.userId,
+          operation: isBulk ? "bulk_index" : "index",
+          status: "success",
+          apiKeyId: keyInfo.id,
+          documentsProcessed: docCount,
+          dataSize: totalSize,
+          ipAddress: c.req.header("x-forwarded-for") || "",
+          userAgent: c.req.header("user-agent") || "",
+        },
+      }),
+      db.user.update({
+        where: { id: keyInfo.userId },
+        data: {
+          used: { increment: docCount },
+          storage: { increment: totalSize },
+        },
+      }),
+    ]);
+
+    return c.json(
+      {
+        success: true,
+        document: isBulk ? typesenseDocs : typesenseDocs[0], // Return array for bulk, single object otherwise
+      },
+      201
+    );
+  } catch (error) {
+    // Log error
+    await db.usageLog.create({
       data: {
         userId: keyInfo.userId,
+        operation: Array.isArray(rawDocument) ? "bulk_index" : "index",
+        status: "failed",
+        errorMessage: error instanceof Error ? error.message : "Unknown error",
         apiKeyId: keyInfo.id,
-        operation: "index",
-        status: "success",
-        documentsProcessed: 1,
-        dataSize: documentSize,
         ipAddress: c.req.header("x-forwarded-for") || "",
         userAgent: c.req.header("user-agent") || "",
       },
-    }),
-    db.user.update({
-      where: { id: keyInfo.userId },
-      data: { used: { increment: 1 }, storage: { increment: documentSize } },
-    }),
-  ]);
-
-  return c.json({ success: true, document: typesenseDoc }, 201);
+    });
+    fs.writeFileSync("error.json", JSON.stringify(error, null, 2));
+    console.log(error, "error");
+    if (error instanceof HTTPException) throw error;
+    throw new HTTPException(500, {
+      message: error instanceof Error ? error.message : "Internal server error",
+    });
+  }
 });
 
 // Endpoint: Bulk Index Documents

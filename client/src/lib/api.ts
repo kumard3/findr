@@ -56,11 +56,12 @@ type ApiHeaders = {
 };
 
 export class SearchAPI {
+  private apiKey: string;
   private userId: string | null = null;
   private collectionName: string | null = null;
 
-  constructor() {
-    this.apiKey = "sk_gn1J2Cax8ggGkRMipFVpmYKvHlIvUrdh"
+  constructor(apiKey: string) {
+    this.apiKey = apiKey;
   }
 
   private getHeaders(includeContentType = false): ApiHeaders {
@@ -148,24 +149,20 @@ export class SearchAPI {
   async indexDocument(
     document: z.infer<typeof DocumentSchema>
   ): Promise<ApiResponse<unknown>> {
-    // await this.validateApiKey();
     try {
-      const documents = Array.isArray(document) ? document : [document];
+      // Validate the document(s) using the schema
+      const validatedDocument = DocumentSchema.parse(document);
+      
+      // Prepare the payload: send the document(s) as-is
+      const payload = Array.isArray(validatedDocument)
+        ? validatedDocument
+        : [validatedDocument];
 
-      const enrichedDocuments = documents.map((doc) => ({
-        ...doc,
-        // biome-ignore lint/style/noNonNullAssertion: <explanation>
-        user_id: this.userId!,
-        indexed_at: Date.now(),
-        id:
-          doc.id?.toString() ||
-          `${this.userId}_${Date.now()}_${Math.random().toString(36).slice(2)}`,
-      }));
-
-      const response = await fetch(`${SEARCH_API_URL}/api/bulk-index`, {
+      // Send the request to the updated /api/index endpoint
+      const response = await fetch(`${SEARCH_API_URL}/api/index`, {
         method: "POST",
         headers: this.getHeaders(true),
-        body: JSON.stringify(enrichedDocuments),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
