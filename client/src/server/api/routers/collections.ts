@@ -1,21 +1,23 @@
-import { z } from "zod";
+// src/server/api/routers/collection.ts
 import { createTRPCRouter, protectedProcedure } from "../trpc";
-import { SearchAPI } from "@/lib/api";
 
 export const collectionRouter = createTRPCRouter({
-	getCollections: protectedProcedure
-		// .input(z.object({ tierId: z.string() }))
-		.query(async ({ ctx, input }) => {
-			const getUserAPIKey = await ctx.db.apiKey.findMany({
-				where: {
-					userId: ctx.session?.user?.id,
-				},
-				select: {
-					value: true,
-				},
-			});
-			const search = new SearchAPI(getUserAPIKey[0]?.value || "");
-			const collections = await search.getDocuments();
-			return collections;
-		}),
+  getCollections: protectedProcedure.query(async ({ ctx }) => {
+    const { session } = ctx;
+
+    // Fetch user's collections from Prisma
+    const collections = await ctx.db.collection.findMany({
+      where: { userId: session.user.id },
+      select: {
+        id: true,
+        name: true,
+        documentCount: true,
+        storageSize: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    return collections;
+  }),
 });

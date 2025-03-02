@@ -3,6 +3,7 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -25,15 +26,20 @@ import { useState } from "react";
 import { useRouter } from "next/router";
 import { toast } from "sonner";
 import { Loader } from "lucide-react";
+import Link from "next/link";
 
-const formSchema = z.object({
-  password: z.string(),
-  email: z.string().email({ message: "Please enter a valid email address." }),
-  confirmPassword: z.string().min(1, { message: "Confirm password is required." }),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
-});
+const formSchema = z
+  .object({
+    password: z.string(),
+    email: z.string().email({ message: "Please enter a valid email address." }),
+    confirmPassword: z
+      .string()
+      .min(1, { message: "Confirm password is required." }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  });
 
 export function SignUpForm() {
   const [showLoader, setShowLoader] = useState(false);
@@ -144,6 +150,14 @@ export function SignUpForm() {
             </Button>
           </form>
         </Form>
+        <CardFooter>
+          <div className="text-sm text-muted-foreground">
+            Already have an account?{" "}
+            <Link href="/auth/login" className="text-primary hover:underline">
+              Login
+            </Link>
+          </div>
+        </CardFooter>
       </CardContent>
     </Card>
   );

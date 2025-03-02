@@ -3,34 +3,55 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { SearchAPI } from "@/lib/api";
+import { toast } from "sonner";
+import { useSession } from "next-auth/react";
 
 export default function DocumentsPage() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [indexContent, setIndexContent] = useState("");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isIndexing, setIsIndexing] = useState(false);
   const [searchResults, setSearchResults] = useState<any[]>([]);
+  const session = useSession();
+  console.log(session, "session");
+  const searchApi = new SearchAPI();
 
-  const searchApi = new SearchAPI(process.env.NEXT_PUBLIC_API_KEY || "");
-
+  // Handle search functionality
   const handleSearch = async () => {
     try {
       const results = await searchApi.searchDocuments(searchQuery);
       setSearchResults(results.hits || []);
     } catch (error) {
       console.error("Search error:", error);
+      toast.error("Failed to search documents");
     }
   };
 
+  // Capture the selected file
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
+    setSelectedFile(file);
+  };
+
+  // Handle file indexing
   const handleIndex = async () => {
+    if (!selectedFile) {
+      toast.error("Please select a file to index");
+      return;
+    }
+
+    setIsIndexing(true);
     try {
-      await searchApi.indexDocument({
-        content: indexContent,
-      });
-      setIndexContent("");
-      alert("Content indexed successfully!");
+      const fileContent = await readFileAsText(selectedFile);
+      const data = parseFileContent(fileContent, selectedFile.name);
+      await searchApi.indexDocument(data);
+      setSelectedFile(null); // Clear the input after success
+      toast.success("File indexed successfully!");
     } catch (error) {
       console.error("Indexing error:", error);
+      toast.error("Failed to index file");
+    } finally {
+      setIsIndexing(false);
     }
   };
 
@@ -40,24 +61,30 @@ export default function DocumentsPage() {
         <h1 className="text-3xl font-bold">Documents</h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* File Indexing Section */}
           <div className="space-y-6">
             <div>
-              <h2 className="text-xl font-semibold mb-4">Index Content</h2>
+              <h2 className="text-xl font-semibold mb-4">Index File</h2>
               <div className="space-y-2">
-                <Label>Content</Label>
-                <Textarea
-                  value={indexContent}
-                  onChange={(e) => setIndexContent(e.target.value)}
-                  placeholder="Enter content to index..."
-                  className="min-h-[200px]"
+                <Label>Upload File (JSON or CSV)</Label>
+                <Input
+                  type="file"
+                  accept=".json,.csv"
+                  onChange={handleFileChange}
+                  disabled={isIndexing}
                 />
-                <Button onClick={handleIndex} className="w-full">
-                  Index Content
+                <Button
+                  onClick={handleIndex}
+                  disabled={isIndexing || !selectedFile}
+                  className="w-full"
+                >
+                  {isIndexing ? "Indexing..." : "Index File"}
                 </Button>
               </div>
             </div>
           </div>
 
+          {/* Search Section */}
           <div className="space-y-6">
             <div>
               <h2 className="text-xl font-semibold mb-4">Search</h2>
@@ -98,3 +125,30 @@ export default function DocumentsPage() {
     </DashboardLayout>
   );
 }
+
+// Helper function to read file content as text
+const readFileAsText = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = reject;
+    reader.readAsText(file);
+  });
+};
+
+// Helper function to parse file content based on extension
+const parseFileContent = (content: string, fileName: string) => {
+  const extension = fileName.split(".").pop()?.toLowerCase();
+  if (extension === "json") {
+    try {
+      return JSON.parse(content);
+    } catch {
+      throw new Error("Invalid JSON format");
+    }
+  } else if (extension === "csv") {
+    // Placeholder for CSV parsing (e.g., use PapaParse library)
+    throw new Error("CSV parsing not implemented yet");
+  } else {
+    throw new Error("Unsupported file type");
+  }
+};

@@ -5,515 +5,295 @@ import { ApiKeyValidator } from "./services/apiKeyValidator";
 import { TypesenseService } from "./services/typesenseService";
 import { rateLimiter } from "./middleware/rateLimiter";
 import { errorHandler } from "./middleware/errorHandler";
-import { documentSchema, type Env, type SearchParams } from "./types";
+import {
+  documentSchema,
+  bulkDocumentSchema,
+  type ApiKeyInfo,
+  type Env,
+  type SearchParams,
+} from "./types";
 import { db } from "./db";
+import { randomUUID } from "crypto";
 
+// Define custom context for Hono variables
 interface CustomContext {
-  keyInfo: {
-    user: {
-      id: string;
-    };
-    allowedOperations: string[];
-    id: string;
-  };
+  keyInfo: ApiKeyInfo;
 }
 
+// Initialize Hono app
 const app = new Hono<{ Bindings: Env; Variables: CustomContext }>();
 
-// Global Middleware
+// Middleware Setup
 app.use("*", cors());
 app.use("*", errorHandler);
-app.use("*", rateLimiter);
-
-// API key validation middleware
+// app.use("*", rateLimiter);
 app.use("*", async (c, next) => {
   const apiKey = c.req.header("x-api-key");
   console.log(apiKey, "apiKey");
-  if (!apiKey) {
-    throw new HTTPException(401, { message: "API key required" });
-  }
+  console.log(c.req, "c.req");
+  if (!apiKey) throw new HTTPException(401, { message: "API key required" });
 
   const validator = new ApiKeyValidator();
-  try {
-    const keyInfo = await validator.validateKey(apiKey);
-    c.set("keyInfo", keyInfo);
-    await next();
-  } catch (error) {
-    throw new HTTPException(401, {
-      message: error instanceof Error ? error.message : "Invalid API key",
-    });
-  }
+  const keyInfo = await validator.validateKey(apiKey);
+  c.set("keyInfo", keyInfo);
+  await next();
 });
 
-// Index API
+// Endpoint: Index a Single Document
 app.post("/api/index", async (c) => {
-  const keyInfo = c.get("keyInfo");
+  const { keyInfo } = c.var;
+  console.log(keyInfo, "keyInfo");
+  if (!keyInfo.permissions.includes("write")) {
+    throw new HTTPException(403, { message: "Write permission required" });
+  }
+
+  const rawDocument = await c.req.json();
+  const document = await documentSchema.parseAsync(rawDocument); // Type: { content: string }
+
+  // Generate a unique ID for the document
+  const documentId = randomUUID();
+  const typesenseDoc = {
+    id: documentId,
+    content: document.content,
+  };
+  const documentSize = Buffer.byteLength(JSON.stringify(typesenseDoc), "utf8");
+
+  // Check usage limits
+  const user = await db.user.findUniqueOrThrow({
+    where: { id: keyInfo.userId },
+    include: { tier: true },
+  });
+  if (
+    user.used >= (user.tier?.documentLimit || 1000) ||
+    user.storage + documentSize > (user.tier?.storageLimit || 10485760)
+  ) {
+    throw new HTTPException(403, { message: "Usage limit exceeded" });
+  }
+
+  // Save to primary database
+  await db.document.create({
+    data: {
+      id: documentId,
+      userId: keyInfo.userId,
+      content: document.content,
+    },
+  });
+
+  // Index in Typesense
   const typesense = new TypesenseService();
+  await typesense.indexDocument(keyInfo.userId, typesenseDoc);
 
-  try {
-    // Check permissions
-    if (!keyInfo.allowedOperations.includes("write")) {
-      throw new HTTPException(403, { message: "Write permission required" });
-    }
-
-    // Validate document
-    const rawDocument = await c.req.json();
-    const document = await documentSchema.parseAsync(rawDocument);
-    const documentSize = JSON.stringify(document).length;
-
-    // Index document
-    const result = await typesense.indexDocument(keyInfo.user.id, document);
-
-    // Log operation
-    await db.usageLog.create({
+  // Update usage logs and user metrics
+  await db.$transaction([
+    db.usageLog.create({
       data: {
-        userId: keyInfo.user.id,
+        userId: keyInfo.userId,
+        apiKeyId: keyInfo.id,
         operation: "index",
         status: "success",
-        apiKeyId: keyInfo.id,
         documentsProcessed: 1,
         dataSize: documentSize,
-        ipAddress: c.req.header("x-forwarded-for"),
-        userAgent: c.req.header("user-agent"),
+        ipAddress: c.req.header("x-forwarded-for") || "",
+        userAgent: c.req.header("user-agent") || "",
       },
-    });
+    }),
+    db.user.update({
+      where: { id: keyInfo.userId },
+      data: { used: { increment: 1 }, storage: { increment: documentSize } },
+    }),
+  ]);
 
-    // Update user usage
-    await db.user.update({
-      where: { id: keyInfo.user.id },
-      data: {
-        used: { increment: 1 },
-        storage: { increment: documentSize },
-      },
-    });
-
-    return c.json({
-      success: true,
-      document: result,
-    });
-  } catch (error) {
-    // Log error
-    await db.usageLog.create({
-      data: {
-        userId: keyInfo.user.id,
-        operation: "index",
-        status: "failed",
-        errorMessage: error instanceof Error ? error.message : "Unknown error",
-        apiKeyId: keyInfo.id,
-        ipAddress: c.req.header("x-forwarded-for"),
-        userAgent: c.req.header("user-agent"),
-      },
-    });
-
-    if (error instanceof HTTPException) throw error;
-    throw new HTTPException(500, {
-      message: error instanceof Error ? error.message : "Internal server error",
-    });
-  }
+  return c.json({ success: true, document: typesenseDoc }, 201);
 });
 
-// Search API
-app.get("/api/search", async (c) => {
-  const keyInfo = c.get("keyInfo");
+// Endpoint: Bulk Index Documents
+app.post("/api/bulk-index", async (c) => {
+  const { keyInfo } = c.var;
+  if (!keyInfo.permissions.includes("write")) {
+    throw new HTTPException(403, { message: "Write permission required" });
+  }
+
+  const rawDocuments = await c.req.json();
+  const documents = await bulkDocumentSchema.parseAsync(rawDocuments); // Type: { content: string }[]
+
+  // Prepare documents with IDs
+  const typesenseDocs = documents.map((doc) => ({
+    id: randomUUID(),
+    content: doc.content,
+  }));
+  const totalSize = typesenseDocs.reduce(
+    (sum, doc) => sum + Buffer.byteLength(JSON.stringify(doc), "utf8"),
+    0
+  );
+  const docCount = typesenseDocs.length;
+
+  // Check usage limits
+  const user = await db.user.findUniqueOrThrow({
+    where: { id: keyInfo.userId },
+    include: { tier: true },
+  });
+  if (
+    user.used + docCount > (user.tier?.documentLimit || 1000) ||
+    user.storage + totalSize > (user.tier?.storageLimit || 10485760)
+  ) {
+    throw new HTTPException(403, { message: "Usage limit exceeded" });
+  }
+
+  // Save to primary database
+  await db.document.createMany({
+    data: typesenseDocs.map((doc) => ({
+      id: doc.id,
+      userId: keyInfo.userId,
+      content: doc.content,
+    })),
+  });
+
+  // Index in Typesense
   const typesense = new TypesenseService();
+  await typesense.indexDocument(keyInfo.userId, typesenseDocs);
 
-  try {
-    const searchParams: SearchParams = {
-      q: c.req.query("q") || "",
-      query_by: c.req.query("query_by") || "content",
-      per_page: Number.parseInt(c.req.query("per_page") || "10"),
-      page: Number.parseInt(c.req.query("page") || "1"),
-      collection_name: c.req.query("collection_name") || "default",
-    };
-
-    const results = await typesense.search(keyInfo.user.id, searchParams);
-
-    // Log search
-    await db.usageLog.create({
+  // Update usage logs and user metrics
+  await db.$transaction([
+    db.usageLog.create({
       data: {
-        userId: keyInfo?.user?.id,
-        operation: "search",
+        userId: keyInfo.userId,
+        apiKeyId: keyInfo.id,
+        operation: "bulk_index",
         status: "success",
-        apiKeyId: keyInfo.id,
-        processingTime: results.search_time_ms,
-        ipAddress: c.req.header("x-forwarded-for"),
-        userAgent: c.req.header("user-agent"),
+        documentsProcessed: docCount,
+        dataSize: totalSize,
+        ipAddress: c.req.header("x-forwarded-for") || "",
+        userAgent: c.req.header("user-agent") || "",
       },
-    });
-
-    return c.json(results);
-  } catch (error) {
-    // Log error
-    await db.usageLog.create({
+    }),
+    db.user.update({
+      where: { id: keyInfo.userId },
       data: {
-        userId: keyInfo.user.id,
-        operation: "search",
-        status: "failed",
-        errorMessage: error instanceof Error ? error.message : "Search failed",
-        apiKeyId: keyInfo.id,
-        ipAddress: c.req.header("x-forwarded-for"),
-        userAgent: c.req.header("user-agent"),
+        used: { increment: docCount },
+        storage: { increment: totalSize },
       },
-    });
+    }),
+  ]);
 
-    throw new HTTPException(400, {
-      message: error instanceof Error ? error.message : "Search error",
-    });
-  }
+  return c.json({ success: true, documents: typesenseDocs }, 201);
 });
-// Delete document endpoint
+
+// Endpoint: Delete a Document
 app.delete("/api/documents/:id", async (c) => {
-  const keyInfo = c.get("keyInfo");
-  const typesense = new TypesenseService();
+  const { keyInfo } = c.var;
+  if (!keyInfo.permissions.includes("write")) {
+    throw new HTTPException(403, { message: "Write permission required" });
+  }
+
   const documentId = c.req.param("id");
 
-  try {
-    if (!keyInfo.allowedOperations.includes("write")) {
-      throw new HTTPException(403, { message: "Write permission required" });
-    }
-
-    await typesense.client
-      .collections(`collection_${keyInfo.user.id}`)
-      .documents(documentId)
-      .delete();
-
-    await db.usageLog.create({
-      data: {
-        userId: keyInfo.user.id,
-        operation: "delete",
-        status: "success",
-        apiKeyId: keyInfo.id,
-        documentsProcessed: 1,
-        ipAddress: c.req.header("x-forwarded-for"),
-        userAgent: c.req.header("user-agent"),
-      },
-    });
-
-    return c.json({ success: true });
-  } catch (error) {
-    await db.usageLog.create({
-      data: {
-        userId: keyInfo.user.id,
-        operation: "delete",
-        status: "failed",
-        errorMessage: error instanceof Error ? error.message : "Delete failed",
-        apiKeyId: keyInfo.id,
-        ipAddress: c.req.header("x-forwarded-for"),
-        userAgent: c.req.header("user-agent"),
-      },
-    });
-
-    throw new HTTPException(500, {
-      message: error instanceof Error ? error.message : "Delete failed",
-    });
+  // Delete from primary database
+  const deleted = await db.document.deleteMany({
+    where: { id: documentId, userId: keyInfo.userId },
+  });
+  if (deleted.count === 0) {
+    throw new HTTPException(404, { message: "Document not found" });
   }
-});
 
-app.get("/api/documents", async (c) => {
-  const keyInfo = c.get("keyInfo");
+  // Delete from Typesense
   const typesense = new TypesenseService();
+  await typesense.client
+    .collections(`collection_${keyInfo.userId}`)
+    .documents(documentId)
+    .delete();
 
-  try {
-    const documents = await typesense.client
-      .collections(`collection_${keyInfo.user.id}`)
-      .documents()
-      .search({
-        q: "*",
-        per_page: 250,
-      });
-    await db.usageLog.create({
-      data: {
-        userId: keyInfo.user.id,
-        operation: "list_documents",
-        status: "success",
-        apiKeyId: keyInfo.id,
-        ipAddress: c.req.header("x-forwarded-for"),
-        userAgent: c.req.header("user-agent"),
-      },
-    });
-    return c.json(documents);
-  } catch (error) {
-    await db.usageLog.create({
-      data: {
-        userId: keyInfo.user.id,
-        operation: "list_documents",
-        status: "failed",
-        errorMessage:
-          error instanceof Error ? error.message : "List documents failed",
-        apiKeyId: keyInfo.id,
-        ipAddress: c.req.header("x-forwarded-for"),
-        userAgent: c.req.header("user-agent"),
-      },
-    });
-    throw new HTTPException(500, {
-      message: error instanceof Error ? error.message : "List documents failed",
-    });
-  }
+  // Log the operation
+  await db.usageLog.create({
+    data: {
+      userId: keyInfo.userId,
+      apiKeyId: keyInfo.id,
+      operation: "delete",
+      status: "success",
+      documentsProcessed: 1,
+      ipAddress: c.req.header("x-forwarded-for") || "",
+      userAgent: c.req.header("user-agent") || "",
+    },
+  });
+
+  return c.json({ success: true });
 });
-// Collection stats endpoint
-app.get("/api/stats", async (c) => {
-  const keyInfo = c.get("keyInfo");
+
+// Endpoint: Search Documents
+app.get("/api/search", async (c) => {
+  const { keyInfo } = c.var;
+  if (!keyInfo.permissions.includes("search")) {
+    throw new HTTPException(403, { message: "Search permission required" });
+  }
+
+  const searchParams: SearchParams = {
+    q: c.req.query("q") || "",
+    query_by: c.req.query("query_by") || "content",
+    per_page: Math.min(parseInt(c.req.query("per_page") || "10"), 100),
+    page: parseInt(c.req.query("page") || "1"),
+    collection_name:
+      c.req.query("collection_name") || `collection_${keyInfo.userId}`,
+  };
+
   const typesense = new TypesenseService();
+  const results = await typesense.search(keyInfo.userId, searchParams);
 
-  try {
-    const stats = await typesense.getCollectionStats(keyInfo.user.id);
-    const usage = await db.user.findUnique({
-      where: { id: keyInfo.user.id },
-      select: { used: true, storage: true, limit: true },
-    });
+  // Log the search operation
+  await db.usageLog.create({
+    data: {
+      userId: keyInfo.userId,
+      apiKeyId: keyInfo.id,
+      operation: "search",
+      status: "success",
+      processingTime: results.search_time_ms,
+      ipAddress: c.req.header("x-forwarded-for") || "",
+      userAgent: c.req.header("user-agent") || "",
+    },
+  });
 
-    return c.json({
-      collection: stats,
-      usage: usage || { used: 0, storage: 0, limit: 0 },
-    });
-  } catch (error) {
-    throw new HTTPException(500, {
-      message: error instanceof Error ? error.message : "Failed to get stats",
-    });
-  }
+  return c.json(results);
 });
 
-// Usage statistics endpoint
+// Endpoint: Usage Statistics
 app.get("/api/usage", async (c) => {
-  const keyInfo = c.get("keyInfo");
+  const { keyInfo } = c.var;
 
-  try {
-    // Get usage logs
-    const logs = await db.usageLog.findMany({
-      where: { userId: keyInfo.user.id },
-      orderBy: { createdAt: "desc" },
-      take: 100, // Limit to last 100 entries
-    });
-
-    // Get aggregated stats
-    const stats = await db.usageLog.groupBy({
+  const [logs, stats, user] = await db.$transaction([
+    db.usageLog.findMany({
+      where: { userId: keyInfo.userId },
+      orderBy: { timestamp: "desc" },
+      take: 100,
+    }),
+    db.usageLog.groupBy({
       by: ["operation", "status"],
-      where: { userId: keyInfo.user.id },
-      _count: true,
-    });
-
-    // Get user limits and current usage
-    const user = await db.user.findUnique({
-      where: { id: keyInfo.user.id },
-      select: {
-        used: true,
-        storage: true,
-        limit: true,
+      where: { userId: keyInfo.userId },
+      _count: {
+        _all: true,
       },
-    });
+      orderBy: {
+        operation: "asc",
+        status: "asc",
+      },
+    }),
+    db.user.findUniqueOrThrow({
+      where: { id: keyInfo.userId },
+      select: { used: true, storage: true, tier: true },
+    }),
+  ]);
 
-    return c.json({
-      logs,
-      stats,
-      limits: user || { used: 0, storage: 0, limit: 0 },
-    });
-  } catch (error) {
-    throw new HTTPException(500, {
-      message:
-        error instanceof Error ? error.message : "Failed to fetch usage data",
-    });
-  }
+  return c.json({
+    logs,
+    stats,
+    limits: {
+      used: user.used,
+      storage: user.storage,
+      documentLimit: user.tier?.documentLimit || 1000,
+      storageLimit: user.tier?.storageLimit || 10485760,
+    },
+  });
 });
 
-// List all collections
-app.get("/api/collections", async (c) => {
-  const keyInfo = c.get("keyInfo");
-  const typesense = new TypesenseService();
-  console.log(keyInfo, "keyInfo");
-  try {
-    const collections = await typesense.client.collections().retrieve();
-    const userCollections = collections.filter((collection) =>
-      collection.name.startsWith(`collection_${keyInfo.user.id}`)
-    );
+// Start the Server
+const port = process.env.PORT || 8000;
+Bun.serve({ port, fetch: app.fetch });
 
-    await db.usageLog.create({
-      data: {
-        userId: keyInfo.user.id,
-        operation: "list_collections",
-        status: "success",
-        apiKeyId: keyInfo.id,
-        ipAddress: c.req.header("x-forwarded-for"),
-        userAgent: c.req.header("user-agent"),
-      },
-    });
-
-    return c.json(userCollections);
-  } catch (error) {
-    await db.usageLog.create({
-      data: {
-        userId: keyInfo.user.id,
-        operation: "list_collections",
-        status: "failed",
-        errorMessage:
-          error instanceof Error ? error.message : "Failed to list collections",
-        apiKeyId: keyInfo.id,
-        ipAddress: c.req.header("x-forwarded-for"),
-        userAgent: c.req.header("user-agent"),
-      },
-    });
-
-    throw new HTTPException(500, {
-      message:
-        error instanceof Error ? error.message : "Failed to list collections",
-    });
-  }
-});
-
-// List all documents in a collection
-app.get("/api/collections/:collectionName/documents", async (c) => {
-  const keyInfo = c.get("keyInfo");
-  const typesense = new TypesenseService();
-  const collectionName = c.req.param("collectionName");
-
-  try {
-    const documents = await typesense.client
-      .collections(collectionName)
-      .documents()
-      .search({
-        q: "*",
-        per_page: 250,
-      });
-
-    await db.usageLog.create({
-      data: {
-        userId: keyInfo.user.id,
-        operation: "list_documents",
-        status: "success",
-        apiKeyId: keyInfo.id,
-        ipAddress: c.req.header("x-forwarded-for"),
-        userAgent: c.req.header("user-agent"),
-      },
-    });
-
-    return c.json(documents);
-  } catch (error) {
-    await db.usageLog.create({
-      data: {
-        userId: keyInfo.user.id,
-        operation: "list_documents",
-        status: "failed",
-        errorMessage:
-          error instanceof Error ? error.message : "Failed to list documents",
-        apiKeyId: keyInfo.id,
-        ipAddress: c.req.header("x-forwarded-for"),
-        userAgent: c.req.header("user-agent"),
-      },
-    });
-
-    throw new HTTPException(500, {
-      message:
-        error instanceof Error ? error.message : "Failed to list documents",
-    });
-  }
-});
-
-// Delete a collection
-app.delete("/api/collections/:collectionName", async (c) => {
-  const keyInfo = c.get("keyInfo");
-  const typesense = new TypesenseService();
-  const collectionName = c.req.param("collectionName");
-
-  try {
-    if (!keyInfo.allowedOperations.includes("write")) {
-      throw new HTTPException(403, { message: "Write permission required" });
-    }
-
-    await typesense.client.collections(collectionName).delete();
-
-    await db.usageLog.create({
-      data: {
-        userId: keyInfo.user.id,
-        operation: "delete_collection",
-        status: "success",
-        apiKeyId: keyInfo.id,
-        ipAddress: c.req.header("x-forwarded-for"),
-        userAgent: c.req.header("user-agent"),
-      },
-    });
-
-    return c.json({ success: true });
-  } catch (error) {
-    await db.usageLog.create({
-      data: {
-        userId: keyInfo.user.id,
-        operation: "delete_collection",
-        status: "failed",
-        errorMessage:
-          error instanceof Error
-            ? error.message
-            : "Failed to delete collection",
-        apiKeyId: keyInfo.id,
-        ipAddress: c.req.header("x-forwarded-for"),
-        userAgent: c.req.header("user-agent"),
-      },
-    });
-
-    throw new HTTPException(500, {
-      message:
-        error instanceof Error ? error.message : "Failed to delete collection",
-    });
-  }
-});
-
-// Delete multiple documents
-app.delete("/api/collections/:collectionName/documents", async (c) => {
-  const keyInfo = c.get("keyInfo");
-  const typesense = new TypesenseService();
-  const collectionName = c.req.param("collectionName");
-
-  try {
-    if (!keyInfo.allowedOperations.includes("write")) {
-      throw new HTTPException(403, { message: "Write permission required" });
-    }
-
-    const { documentIds } = await c.req.json();
-    if (!Array.isArray(documentIds)) {
-      throw new HTTPException(400, { message: "documentIds must be an array" });
-    }
-
-    const deletePromises = documentIds.map((id) =>
-      typesense.client.collections(collectionName).documents(id).delete()
-    );
-
-    await Promise.all(deletePromises);
-
-    await db.usageLog.create({
-      data: {
-        userId: keyInfo.user.id,
-        operation: "bulk_delete_documents",
-        status: "success",
-        apiKeyId: keyInfo.id,
-        documentsProcessed: documentIds.length,
-        ipAddress: c.req.header("x-forwarded-for"),
-        userAgent: c.req.header("user-agent"),
-      },
-    });
-
-    return c.json({ success: true, deletedCount: documentIds.length });
-  } catch (error) {
-    await db.usageLog.create({
-      data: {
-        userId: keyInfo.user.id,
-        operation: "bulk_delete_documents",
-        status: "failed",
-        errorMessage:
-          error instanceof Error ? error.message : "Failed to delete documents",
-        apiKeyId: keyInfo.id,
-        ipAddress: c.req.header("x-forwarded-for"),
-        userAgent: c.req.header("user-agent"),
-      },
-    });
-
-    throw new HTTPException(500, {
-      message:
-        error instanceof Error ? error.message : "Failed to delete documents",
-    });
-  }
-});
-
-const port = Bun.env.PORT || 8000;
-Bun.serve({
-  port,
-  fetch: app.fetch,
-});
 export default app;

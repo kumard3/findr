@@ -1,13 +1,13 @@
 import { db } from "../db";
-import type { ApiKeyWithUser } from "../types";
+import type { ApiKeyInfo } from "../types";
 
 export class ApiKeyValidator {
-  async validateKey(keyId: string) {
+  async validateKey(keyId: string): Promise<ApiKeyInfo> {
     const apiKey = await db.apiKey.findUnique({
       where: { value: keyId },
       include: { user: true },
     });
-console.log(apiKey,"")
+
     if (!apiKey) {
       throw new Error("Invalid API key");
     }
@@ -24,8 +24,10 @@ console.log(apiKey,"")
 
     return {
       id: apiKey.id,
-      user: apiKey.user,
-      allowedOperations: apiKey.allowedOperations,
+      userId: apiKey.userId,
+      permissions: apiKey.permissions,
+      rateLimit: apiKey.rateLimit,
+      requestCount: apiKey.requestCount + 1, // Reflect the incremented count
     };
   }
 }
