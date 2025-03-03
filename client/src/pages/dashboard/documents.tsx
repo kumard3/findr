@@ -14,12 +14,14 @@ export default function DocumentsPage() {
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const session = useSession();
   console.log(session, "session");
-  const searchApi = new SearchAPI();
+  const searchApi = new SearchAPI("sk_4Etu0CEwfh7C5BAHWJnyu8rfgFyn5Tgh", session.data?.user.id);
 
   // Handle search functionality
   const handleSearch = async () => {
     try {
-      const results = await searchApi.searchDocuments(searchQuery);
+      const results = await searchApi.searchDocuments(searchQuery, {
+        collectionName: "testtwo",
+      });
       setSearchResults(results.hits || []);
     } catch (error) {
       console.error("Search error:", error);
@@ -44,7 +46,19 @@ export default function DocumentsPage() {
     try {
       const fileContent = await readFileAsText(selectedFile);
       const data = parseFileContent(fileContent, selectedFile.name);
-      await searchApi.indexDocument(data);
+      if (Array.isArray(data)) {
+        for (const doc of data) {
+          await searchApi.indexDocument({
+            indexName: "testtwo",
+            body: doc,
+          });
+        }
+      } else {
+        await searchApi.indexDocument({
+          indexName: "testtwo",
+          body: data,
+        });
+      }
       setSelectedFile(null); // Clear the input after success
       toast.success("File indexed successfully!");
     } catch (error) {

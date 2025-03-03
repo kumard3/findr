@@ -9,19 +9,33 @@ export interface Env {
   DATABASE_URL: string;
 }
 
+export const documentSchema = z
+  .object({
+    indexName: z.string(),
+    body: z.object({
+      id: z.string().optional(),
+    }),
+  })
+  .refine(
+    (doc) => JSON.stringify(doc.body).length <= MAX_DOCUMENT_SIZE,
+    `Document size exceeds 100KB limit`
+  );
+
 // Document Validation Schemas
 const MAX_DOCUMENT_SIZE = 100000; // 100KB per document
-export const documentValidation = z.object({
-  id: z.string().optional(),
-  content: z.string().min(1), // Required content field
-}).refine(
-  (doc) => JSON.stringify(doc).length <= MAX_DOCUMENT_SIZE,
-  `Document size exceeds 100KB limit`
-);
-export const documentSchema = documentValidation; // For single document
-export const bulkDocumentSchema = z.array(documentValidation); // For bulk documents
+// export const documentValidation = documentSchema.refine(
+//   .object({
+//     indexName: z.string().optional(),
+//     body: z.string().min(1), // Required content field
+//   })
+//     .refine(
+//     (doc) => JSON.stringify(doc.body).length <= MAX_DOCUMENT_SIZE,
+//     `Document size exceeds 100KB limit`
+//   );
+// export const documentSchema = documentValidation; // For single document
+export const bulkDocumentSchema = z.array(documentSchema); // For bulk documents
 
-export type ValidatedDocument = z.infer<typeof documentValidation>;
+export type ValidatedDocument = z.infer<typeof documentSchema>;
 
 // API Key and User Interfaces
 export interface ApiKeyInfo {
@@ -39,14 +53,14 @@ export interface ApiKeyWithUser extends ApiKey {
 // Search Parameters
 export interface SearchParams {
   q: string;
-  query_by: string;
+  query_by?: string;
   per_page?: number;
   page?: number;
   filter_by?: string;
   sort_by?: string;
   facet_by?: string;
   max_hits?: number;
-  collection_name?: string;
+  collection_name: string;
 }
 
 // Typesense Response
@@ -61,4 +75,16 @@ export interface TypesenseResponse {
 export interface IndexError extends Error {
   code: "RATE_LIMIT" | "INVALID_KEY" | "SCHEMA_ERROR" | "SERVER_ERROR";
   details?: any;
+}
+
+export interface CollectionIndexRequest {
+  name: string;
+  fields: {
+    name: string;
+    type: string;
+    facet?: boolean;
+    sort?: boolean;
+  }[];
+  default_sorting_field?: string;
+  enable_nested_fields?: boolean;
 }

@@ -1,6 +1,5 @@
 import { Client } from "typesense";
-import type { SearchParams, IndexError, Env, ValidatedDocument } from "../types";
-import { db } from "../db";
+import type { SearchParams, IndexError, ValidatedDocument } from "../types";
 import env from "../env";
 import { z } from "zod";
 
@@ -31,8 +30,8 @@ export class TypesenseService {
     });
   }
 
-  async createOrGetCollection(userId: string) {
-    const collectionName = `collection_${userId}`;
+  async createOrGetCollection(userId: string, name: string) {
+    const collectionName = `collection_${userId}_${name}`;
     try {
       return await this.client.collections(collectionName).retrieve();
     } catch (error) {
@@ -44,27 +43,61 @@ export class TypesenseService {
           { name: ".*", type: "auto" },
         ],
         default_sorting_field: "indexed_at",
+        enable_nested_fields: true, // Enable dynamic indexing of nested fields
       });
     }
   }
 
-  async indexDocument(userId: string, document: ValidatedDocument | ValidatedDocument[]) {
+  async indexDocument(
+    userId: string,
+    collectionName: string,
+    document: ValidatedDocument["body"]
+  ) {
     try {
-      await this.createOrGetCollection(userId);
-      const collection = this.client.collections(`collection_${userId}`);
+      await this.createOrGetCollection(userId, collectionName);
+      const collection = this.client.collections(
+        `collection_${userId}_${collectionName}`
+      );
+
+      // const documents = Array.isArray(document) ? document : [document];
+      const enrichedDocuments = {
+        id: document.id,
+        indexed_at: Date.now(),
+        user_id: userId,
+        body: document,
+      };
+
+      console.log("enrichedDocuments", enrichedDocuments);
+      const indexedDoc = await collection.documents().create(enrichedDocuments);
+
+      return indexedDoc;
+    } catch (error) {
+      const indexError: IndexError = new Error(
+        error instanceof Error ? error.message : "Index error"
+      ) as IndexError;
+      indexError.code = "SCHEMA_ERROR";
+      indexError.details = error;
+      throw indexError;
+    }
+  }
+  async indexBulkDocument(
+    userId: string,
+    collectionName: string,
+    document: ValidatedDocument | ValidatedDocument[]
+  ) {
+    try {
+      await this.createOrGetCollection(userId, collectionName);
+      const collection = this.client.collections(
+        `collection_${userId}_${collectionName}`
+      );
 
       const documents = Array.isArray(document) ? document : [document];
       const enrichedDocuments = documents.map((doc) => ({
         ...doc,
-        user_id: userId,
         indexed_at: Date.now(),
-        id: doc.id || `${userId}_${Date.now()}_${Math.random().toString(36).slice(2)}`,
       }));
 
-      const indexedDoc = await collection.documents().import(enrichedDocuments, {
-        action: "create",
-        dirty_values: "coerce_or_reject",
-      });
+      const indexedDoc = await collection.documents().upsert(enrichedDocuments);
 
       return indexedDoc;
     } catch (error) {
@@ -77,15 +110,19 @@ export class TypesenseService {
     }
   }
 
-  async search(userId: string, params: SearchParams) {
+  async search(userId: string, collectionName: string, params: SearchParams) {
     const searchParams = {
       ...params,
       filter_by: `user_id:=${userId}`,
       per_page: Math.min(params.per_page || 10, 100),
       max_hits: Math.min(params.max_hits || 1000, 10000),
+      collection_name: `collection_${userId}_${collectionName}`,
     };
 
-    return await this.client.collections(`collection_${userId}`).documents().search(searchParams);
+    return await this.client
+      .collections(`collection_${userId}_${collectionName}`)
+      .documents()
+      .search(searchParams);
   }
 
   async deleteCollection(userId: string) {

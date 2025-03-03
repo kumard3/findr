@@ -45,10 +45,22 @@ const documentValidation = z
     `Individual document size exceeds ${MAX_DOCUMENT_SIZE / 1000}KB limit`
   );
 
-const DocumentSchema = z.union([
-  documentValidation,
-  z.array(documentValidation),
-]);
+export const DocumentSchema = z
+  .object({
+    indexName: z.string(),
+    body: z.object({
+      id: z.string().optional(),
+    }),
+  })
+  .refine(
+    (doc) => JSON.stringify(doc.body).length <= MAX_DOCUMENT_SIZE,
+    `Document size exceeds 100KB limit`
+  );
+
+// const DocumentSchema = z.union([
+//   documentValidation,
+//   z.array(documentValidation),
+// ]);
 
 type ApiHeaders = {
   "x-api-key": string;
@@ -60,8 +72,9 @@ export class SearchAPI {
   private userId: string | null = null;
   private collectionName: string | null = null;
 
-  constructor(apiKey: string) {
+  constructor(apiKey: string, userId: string) {
     this.apiKey = apiKey;
+    this.userId = userId;
   }
 
   private getHeaders(includeContentType = false): ApiHeaders {
@@ -76,7 +89,7 @@ export class SearchAPI {
 
   async searchDocuments(
     query: string,
-    options: { limit?: number; offset?: number } = {}
+    options: { limit?: number; offset?: number; collectionName?: string } = {}
   ): Promise<
     Array<{
       document: Record<string, unknown>;
@@ -88,10 +101,11 @@ export class SearchAPI {
     try {
       const searchParams = {
         q: query,
-        query_by: "content",
+        query_by: "query_by",
         filter_by: `user_id:${this.userId}`,
         per_page: Math.min(options.limit || 10, 100),
         page: (options.offset || 0) + 1,
+        collection_name: options.collectionName || "default",
       };
 
       const response = await fetch(
@@ -151,18 +165,13 @@ export class SearchAPI {
   ): Promise<ApiResponse<unknown>> {
     try {
       // Validate the document(s) using the schema
-      const validatedDocument = DocumentSchema.parse(document);
-      
-      // Prepare the payload: send the document(s) as-is
-      const payload = Array.isArray(validatedDocument)
-        ? validatedDocument
-        : [validatedDocument];
+      // const validatedDocument = DocumentSchema.parse(document);,
 
       // Send the request to the updated /api/index endpoint
       const response = await fetch(`${SEARCH_API_URL}/api/index`, {
         method: "POST",
         headers: this.getHeaders(true),
-        body: JSON.stringify(payload),
+        body: JSON.stringify(document),
       });
 
       if (!response.ok) {

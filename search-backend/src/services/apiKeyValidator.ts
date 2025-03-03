@@ -12,9 +12,9 @@ export class ApiKeyValidator {
       throw new Error("Invalid API key");
     }
 
-    if (apiKey.requestCount >= apiKey.rateLimit) {
-      throw new Error("Rate limit exceeded");
-    }
+    // if (apiKey.requestCount >= apiKey.rateLimit) {
+    //   throw new Error("Rate limit exceeded");
+    // }
 
     // Update request count
     await db.apiKey.update({
