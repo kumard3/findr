@@ -11,25 +11,33 @@ import {
   type ApiKeyInfo,
   type Env,
   type SearchParams,
-  ValidatedDocument,
+  InputDocument,
+  SingleCollectionDatatype,
 } from "./types";
 import { db } from "./db";
 import { randomUUID } from "crypto";
+import { serveStatic } from "hono/bun";
+
 import { z } from "zod";
 import fs from "fs";
+import { indexQueue } from "./services/worker";
+import { swaggerUI } from "@hono/swagger-ui";
 
 interface CustomContext {
   keyInfo: ApiKeyInfo;
 }
 
 const app = new Hono<{ Bindings: Env; Variables: CustomContext }>();
+// Redis connection (adjust based on your setup)
 
 app.use("*", cors());
-// app.use("*", errorHandler);
-// app.use("*", rateLimiter);
+
 app.use("*", async (c, next) => {
+  if (c.req.path.includes("/doc") || c.req.path.includes("/static/")) {
+    await next();
+    return;
+  }
   const apiKey = c.req.header("x-api-key");
-  console.log(apiKey, "apiKey");
   if (!apiKey) throw new HTTPException(401, { message: "API key required" });
 
   const validator = new ApiKeyValidator();
@@ -41,103 +49,52 @@ app.use("*", async (c, next) => {
 });
 
 app.post("/api/index", async (c) => {
-  const keyInfo = c.get("keyInfo");
-  const typesense = new TypesenseService();
-  const rawDocument = (await c.req.json()) as ValidatedDocument;
-  let documents: z.infer<typeof documentSchema>[];
-  let isBulk = false;
   try {
-    // if (!keyInfo.permissions.includes("write")) {
-    //   throw new HTTPException(403, { message: "Write permission required" });
-    // }
-    // const singleDoc = await documentSchema.parseAsync(rawDocument);
+    const keyInfo = c.get("keyInfo");
 
-    const typesenseDocs = {
-      ...rawDocument.body,
-      id: randomUUID(),
-    };
+    const rawDocument = (await c.req.json()) as InputDocument;
+    let documents: SingleCollectionDatatype | SingleCollectionDatatype[];
+    let isBulk = false;
 
-    // Calculate total size and document count
-    const totalSize = Buffer.byteLength(JSON.stringify(typesenseDocs), "utf8");
-    const docCount = 1;
+    if (Array.isArray(rawDocument.body)) {
+      const modifiedBody = rawDocument.body.map((doc) => {
+        return {
+          id: randomUUID(),
+          collection_name: `collection_${keyInfo.userId}_${rawDocument.indexName}`,
+          indexed_at: Date.now(),
+          user_id: keyInfo.userId,
+          document: doc,
+        };
+      });
+      documents = modifiedBody;
+      isBulk = true;
+    } else {
+      const modifiedBody = {
+        id: randomUUID(),
+        collection_name: `collection_${keyInfo.userId}_${rawDocument.indexName}`,
+        indexed_at: Date.now(),
+        user_id: keyInfo.userId,
+        document: rawDocument.body,
+      };
+      documents = [modifiedBody];
+    }
+    // Handle single or bulk documents
+    await indexQueue.add("indexJob", {
+      documents,
+    });
 
-    // Fetch user with tier info for usage limits
-    // const user = await db.user.findUnique({
-    //   where: { id: keyInfo.userId },
-    //   include: { tier: true },
-    // });
-
-    // // Check usage limits
-    // const tier = user?.tier || { documentLimit: 1000, storageLimit: 10485760 };
-    // if (
-    //   (user?.used || 0) + docCount > tier.documentLimit ||
-    //   (user?.storage || 0) + totalSize > tier.storageLimit
-    // ) {
-    //   throw new HTTPException(403, { message: "Usage limit exceeded" });
-    // }
-
-    // Save to primary database
-    // await db.document.create({
-    //   data: {
-    //     id: typesenseDocs.id,
-    //     userId: keyInfo.userId,
-    //     content: { ...typesenseDocs, id: undefined }, // Exclude id from content to avoid duplication
-    //   },
-    // });
-
-    // Index document(s) in Typesense
-    await typesense.indexDocument(
-      keyInfo.userId,
-      rawDocument.indexName,
-      typesenseDocs
-    );
-
-    // Log operation and update user usage in a transaction
-    // await db.$transaction([
-    //   db.usageLog.create({
-    //     data: {
-    //       userId: keyInfo.userId,
-    //       operation: isBulk ? "bulk_index" : "index",
-    //       status: "success",
-    //       apiKeyId: keyInfo.id,
-    //       documentsProcessed: docCount,
-    //       dataSize: totalSize,
-    //       ipAddress: c.req.header("x-forwarded-for") || "",
-    //       userAgent: c.req.header("user-agent") || "",
-    //     },
-    //   }),
-    //   db.user.update({
-    //     where: { id: keyInfo.userId },
-    //     data: {
-    //       used: { increment: docCount },
-    //       storage: { increment: totalSize },
-    //     },
-    //   }),
-    // ]);
-
+    // Return a response immediately (job is queued)
     return c.json(
       {
         success: true,
-        document: typesenseDocs,
+        message: isBulk ? "Bulk indexing job queued" : "Indexing job queued",
       },
-      201
+      202 // 202 Accepted
     );
   } catch (error) {
-    await db.usageLog.create({
-      data: {
-        userId: keyInfo.userId,
-        operation: Array.isArray(rawDocument) ? "bulk_index" : "index",
-        status: "failed",
-        errorMessage: error instanceof Error ? error.message : "Unknown error",
-        apiKeyId: keyInfo.id,
-        ipAddress: c.req.header("x-forwarded-for") || "",
-        userAgent: c.req.header("user-agent") || "",
-      },
-    });
-    fs.writeFileSync("error.json", JSON.stringify(error, null, 2));
-    if (error instanceof HTTPException) throw error;
-    throw new HTTPException(500, {
-      message: error instanceof Error ? error.message : "Internal server error",
+    // Handle validation or other errors
+    throw new HTTPException(400, {
+      message: error instanceof Error ? error.message : "Invalid request data",
     });
   }
 });
@@ -252,7 +209,7 @@ app.get("/api/stats", async (c) => {
     const stats = await typesense.getCollectionStats(keyInfo.userId);
     const usage = await db.user.findUnique({
       where: { id: keyInfo.userId },
-      select: { used: true, storage: true,  },
+      select: { used: true, storage: true },
     });
 
     return c.json({
@@ -274,7 +231,7 @@ app.get("/api/usage", async (c) => {
     // Get usage logs
     const logs = await db.usageLog.findMany({
       where: { userId: keyInfo.userId },
-      orderBy: {  },
+      orderBy: {},
       take: 100, // Limit to last 100 entries
     });
 
@@ -306,6 +263,10 @@ app.get("/api/usage", async (c) => {
     });
   }
 });
+
+app.use("/static/*", serveStatic({ root: "./" }));
+
+app.get("/doc", swaggerUI({ url: "/static/openapi.yaml" }));
 
 const port = process.env.PORT || 8000;
 Bun.serve({ port, fetch: app.fetch });

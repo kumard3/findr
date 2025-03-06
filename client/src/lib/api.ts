@@ -101,7 +101,6 @@ export class SearchAPI {
     try {
       const searchParams = {
         q: query,
-        query_by: "query_by",
         filter_by: `user_id:${this.userId}`,
         per_page: Math.min(options.limit || 10, 100),
         page: (options.offset || 0) + 1,
@@ -160,9 +159,7 @@ export class SearchAPI {
     }
   }
 
-  async indexDocument(
-    document: z.infer<typeof DocumentSchema>
-  ): Promise<ApiResponse<unknown>> {
+  async indexDocument(document: any[]): Promise<ApiResponse<unknown>> {
     try {
       // Validate the document(s) using the schema
       // const validatedDocument = DocumentSchema.parse(document);,

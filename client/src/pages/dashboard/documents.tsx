@@ -12,15 +12,19 @@ export default function DocumentsPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isIndexing, setIsIndexing] = useState(false);
   const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [indexName, setIndexName] = useState("");
   const session = useSession();
   console.log(session, "session");
-  const searchApi = new SearchAPI("sk_4Etu0CEwfh7C5BAHWJnyu8rfgFyn5Tgh", session.data?.user.id);
+  const searchApi = new SearchAPI(
+    "sk_4Etu0CEwfh7C5BAHWJnyu8rfgFyn5Tgh",
+    session.data?.user.id || ""
+  );
 
   // Handle search functionality
   const handleSearch = async () => {
     try {
       const results = await searchApi.searchDocuments(searchQuery, {
-        collectionName: "testtwo",
+        collectionName: indexName,
       });
       setSearchResults(results.hits || []);
     } catch (error) {
@@ -46,19 +50,23 @@ export default function DocumentsPage() {
     try {
       const fileContent = await readFileAsText(selectedFile);
       const data = parseFileContent(fileContent, selectedFile.name);
-      if (Array.isArray(data)) {
-        for (const doc of data) {
-          await searchApi.indexDocument({
-            indexName: "testtwo",
-            body: doc,
-          });
-        }
-      } else {
-        await searchApi.indexDocument({
-          indexName: "testtwo",
-          body: data,
-        });
-      }
+      await searchApi.indexDocument({
+        indexName: indexName,
+        body: data,
+      });
+      // if (Array.isArray(data)) {
+      //   for (const doc of data) {
+      //     await searchApi.indexDocument({
+      //       indexName: indexName,
+      //       body: doc,
+      //     });
+      //   }
+      // } else {
+      //   await searchApi.indexDocument({
+      //     indexName: indexName,
+      //     body: data,
+      //   });
+      // }
       setSelectedFile(null); // Clear the input after success
       toast.success("File indexed successfully!");
     } catch (error) {
@@ -95,6 +103,12 @@ export default function DocumentsPage() {
                   {isIndexing ? "Indexing..." : "Index File"}
                 </Button>
               </div>
+              <Input
+                type="text"
+                value={indexName}
+                onChange={(e) => setIndexName(e.target.value)}
+                placeholder="Enter index name"
+              />
             </div>
           </div>
 
@@ -104,6 +118,15 @@ export default function DocumentsPage() {
               <h2 className="text-xl font-semibold mb-4">Search</h2>
               <div className="space-y-2">
                 <Label>Search Query</Label>
+                <div>
+                  <Label>Index Name</Label>
+                  <Input
+                    type="text"
+                    value={indexName}
+                    onChange={(e) => setIndexName(e.target.value)}
+                    placeholder="Enter index name"
+                  />
+                </div>
                 <div className="flex gap-2">
                   <Input
                     value={searchQuery}

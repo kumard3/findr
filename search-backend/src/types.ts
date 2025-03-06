@@ -1,5 +1,5 @@
 import type { ApiKey, User } from "@prisma/client";
-import { z } from "zod";
+import { any, z } from "zod";
 
 // Environment Variables
 export interface Env {
@@ -9,31 +9,28 @@ export interface Env {
   DATABASE_URL: string;
 }
 
-export const documentSchema = z
-  .object({
-    indexName: z.string(),
-    body: z.object({
+export const documentSchema = z.object({
+  indexName: z.string(),
+  body: z
+    .object({
       id: z.string().optional(),
-    }),
-  })
-  .refine(
-    (doc) => JSON.stringify(doc.body).length <= MAX_DOCUMENT_SIZE,
-    `Document size exceeds 100KB limit`
-  );
+    })
+    .passthrough(),
+});
 
 // Document Validation Schemas
 const MAX_DOCUMENT_SIZE = 100000; // 100KB per document
-// export const documentValidation = documentSchema.refine(
-//   .object({
-//     indexName: z.string().optional(),
-//     body: z.string().min(1), // Required content field
-//   })
-//     .refine(
-//     (doc) => JSON.stringify(doc.body).length <= MAX_DOCUMENT_SIZE,
-//     `Document size exceeds 100KB limit`
-//   );
-// export const documentSchema = documentValidation; // For single document
-export const bulkDocumentSchema = z.array(documentSchema); // For bulk documents
+
+export const bulkDocumentSchema = z.object({
+  indexName: z.string(),
+  body: z.array(
+    z
+      .object({
+        id: z.string().optional(),
+      })
+      .passthrough()
+  ),
+}); // For bulk documents
 
 export type ValidatedDocument = z.infer<typeof documentSchema>;
 
@@ -87,4 +84,33 @@ export interface CollectionIndexRequest {
   }[];
   default_sorting_field?: string;
   enable_nested_fields?: boolean;
+}
+
+export const InputSingleDocument = z.object({
+  indexName: z.string(),
+  body: z
+    .record(z.union([z.string(), z.array(z.string()), z.number(), z.any()]))
+    .refine(
+      (doc) => JSON.stringify(doc).length <= MAX_DOCUMENT_SIZE,
+      `Document size exceeds 100KB limit`
+    ),
+});
+
+export const InputMutliDocument = z.object({
+  indexName: z.string(),
+  body: z.array(InputSingleDocument.shape.body),
+});
+
+export type InputDocument =
+  | z.infer<typeof InputSingleDocument>
+  | z.infer<typeof InputMutliDocument>;
+
+export interface SingleCollectionDatatype {
+  id: string;
+  collection_name: string;
+  indexed_at: number;
+  user_id: string;
+  document: {
+    [key: string]: string | string[] | number | any;
+  };
 }
