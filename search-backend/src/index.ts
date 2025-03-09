@@ -154,123 +154,6 @@ app.get("/api/search", async (c) => {
   }
 });
 
-// Delete document endpoint
-app.delete("/api/documents/:id", async (c) => {
-  const keyInfo = c.get("keyInfo");
-  const typesense = new TypesenseService();
-  const documentId = c.req.param("id");
-
-  try {
-    if (!keyInfo.permissions.includes("write")) {
-      throw new HTTPException(403, { message: "Write permission required" });
-    }
-
-    await typesense.client
-      .collections(`collection_${keyInfo.userId}`)
-      .documents(documentId)
-      .delete();
-
-    await db.usageLog.create({
-      data: {
-        userId: keyInfo.userId,
-        operation: "delete",
-        status: "success",
-        apiKeyId: keyInfo.id,
-        documentsProcessed: 1,
-        ipAddress: c.req.header("x-forwarded-for"),
-        userAgent: c.req.header("user-agent"),
-      },
-    });
-
-    return c.json({ success: true });
-  } catch (error) {
-    await db.usageLog.create({
-      data: {
-        userId: keyInfo.userId,
-        operation: "delete",
-        status: "failed",
-        errorMessage: error instanceof Error ? error.message : "Delete failed",
-        apiKeyId: keyInfo.id,
-        ipAddress: c.req.header("x-forwarded-for"),
-        userAgent: c.req.header("user-agent"),
-      },
-    });
-
-    throw new HTTPException(500, {
-      message: error instanceof Error ? error.message : "Delete failed",
-    });
-  }
-});
-app.get("/api/stats", async (c) => {
-  const keyInfo = c.get("keyInfo");
-  const typesense = new TypesenseService();
-  const stats = await typesense.getCollectionStats(keyInfo.userId);
-  return c.json(stats);
-});
-
-// Collection stats endpoint
-app.get("/api/stats", async (c) => {
-  const keyInfo = c.get("keyInfo");
-  const typesense = new TypesenseService();
-
-  try {
-    const stats = await typesense.getCollectionStats(keyInfo.userId);
-    const usage = await db.user.findUnique({
-      where: { id: keyInfo.userId },
-      select: { used: true, storage: true },
-    });
-
-    return c.json({
-      collection: stats,
-      usage: usage || { used: 0, storage: 0, limit: 0 },
-    });
-  } catch (error) {
-    throw new HTTPException(500, {
-      message: error instanceof Error ? error.message : "Failed to get stats",
-    });
-  }
-});
-
-// Usage statistics endpoint
-app.get("/api/usage", async (c) => {
-  const keyInfo = c.get("keyInfo");
-
-  try {
-    // Get usage logs
-    const logs = await db.usageLog.findMany({
-      where: { userId: keyInfo.userId },
-      orderBy: {},
-      take: 100, // Limit to last 100 entries
-    });
-
-    // Get aggregated stats
-    const stats = await db.usageLog.groupBy({
-      by: ["operation", "status"],
-      where: { userId: keyInfo.userId },
-      _count: true,
-    });
-
-    // Get user limits and current usage
-    const user = await db.user.findUnique({
-      where: { id: keyInfo.userId },
-      select: {
-        used: true,
-        storage: true,
-      },
-    });
-
-    return c.json({
-      logs,
-      stats,
-      limits: user || { used: 0, storage: 0, limit: 0 },
-    });
-  } catch (error) {
-    throw new HTTPException(500, {
-      message:
-        error instanceof Error ? error.message : "Failed to fetch usage data",
-    });
-  }
-}); // Usage statistics endpoint
 app.get("/api/collections", async (c) => {
   const keyInfo = c.get("keyInfo");
 
@@ -295,7 +178,6 @@ app.get("/api/documents/:collectionName", async (c) => {
     console.log("documents", documents);
     return c.json({ documents });
   } catch (error) {
-    console.log("error", error);
     throw new HTTPException(500, {
       message:
         error instanceof Error ? error.message : "Failed to fetch documents",
