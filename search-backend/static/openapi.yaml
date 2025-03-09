@@ -234,6 +234,81 @@ paths:
                   message:
                     type: string
 
+  /api/collections:
+    get:
+      summary: Get user collections
+      description: Get all collections for the authenticated user
+      operationId: getCollections
+      security:
+        - apiKeyAuth: []
+      responses:
+        "200":
+          description: List of collections
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  collections:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        name:
+                          type: string
+                        userId:
+                          type: string
+                        createdAt:
+                          type: string
+                          format: date-time
+        "500":
+          description: Failed to fetch collections
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /api/documents/{collectionName}:
+    get:
+      summary: Get documents in a collection
+      description: Get all documents in a specified collection
+      operationId: getDocumentsByCollection
+      security:
+        - apiKeyAuth: []
+      parameters:
+        - name: collectionName
+          in: path
+          required: true
+          description: Name of the collection to fetch documents from
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of documents in the collection
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  documents:
+                    type: array
+                    items:
+                      type: object
+        "500":
+          description: Failed to fetch documents
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
 components:
   securitySchemes:
     apiKeyAuth:
