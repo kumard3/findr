@@ -11,9 +11,51 @@ importers:
       '@auth/prisma-adapter':
         specifier: ^2.7.4
         version: 2.7.4(@prisma/client@6.1.0(prisma@6.1.0))
+      '@excalidraw/excalidraw':
+        specifier: ^0.17.6
+        version: 0.17.6(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       '@hookform/resolvers':
         specifier: ^3.9.1
         version: 3.9.1(react-hook-form@7.54.2(react@19.0.0))
+      '@lexical/code':
+        specifier: ^0.27.1
+        version: 0.27.1
+      '@lexical/file':
+        specifier: ^0.27.1
+        version: 0.27.1
+      '@lexical/hashtag':
+        specifier: ^0.27.1
+        version: 0.27.1
+      '@lexical/link':
+        specifier: ^0.27.1
+        version: 0.27.1
+      '@lexical/list':
+        specifier: ^0.27.1
+        version: 0.27.1
+      '@lexical/markdown':
+        specifier: ^0.27.1
+        version: 0.27.1
+      '@lexical/overflow':
+        specifier: ^0.27.1
+        version: 0.27.1
+      '@lexical/react':
+        specifier: ^0.27.1
+        version: 0.27.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(yjs@13.6.24)
+      '@lexical/rich-text':
+        specifier: ^0.27.1
+        version: 0.27.1
+      '@lexical/selection':
+        specifier: ^0.27.1
+        version: 0.27.1
+      '@lexical/table':
+        specifier: ^0.27.1
+        version: 0.27.1
+      '@lexical/text':
+        specifier: ^0.27.1
+        version: 0.27.1
+      '@lexical/utils':
+        specifier: ^0.27.1
+        version: 0.27.1
       '@prisma/client':
         specifier: 6.1.0
         version: 6.1.0(prisma@6.1.0)
@@ -32,6 +74,9 @@ importers:
       '@radix-ui/react-checkbox':
         specifier: ^1.1.3
         version: 1.1.3(@types/react-dom@19.0.2(@types/react@19.0.2))(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      '@radix-ui/react-collapsible':
+        specifier: ^1.1.2
+        version: 1.1.2(@types/react-dom@19.0.2(@types/react@19.0.2))(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       '@radix-ui/react-dialog':
         specifier: ^1.1.4
         version: 1.1.4(@types/react-dom@19.0.2(@types/react@19.0.2))(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
@@ -41,6 +86,9 @@ importers:
       '@radix-ui/react-hover-card':
         specifier: ^1.1.4
         version: 1.1.4(@types/react-dom@19.0.2(@types/react@19.0.2))(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      '@radix-ui/react-icons':
+        specifier: ^1.3.2
+        version: 1.3.2(react@19.0.0)
       '@radix-ui/react-label':
         specifier: ^2.1.1
         version: 2.1.1(@types/react-dom@19.0.2(@types/react@19.0.2))(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
@@ -50,6 +98,9 @@ importers:
       '@radix-ui/react-popover':
         specifier: ^1.1.4
         version: 1.1.4(@types/react-dom@19.0.2(@types/react@19.0.2))(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      '@radix-ui/react-scroll-area':
+        specifier: ^1.2.3
+        version: 1.2.3(@types/react-dom@19.0.2(@types/react@19.0.2))(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       '@radix-ui/react-select':
         specifier: ^2.1.4
         version: 2.1.4(@types/react-dom@19.0.2(@types/react@19.0.2))(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
@@ -65,6 +116,12 @@ importers:
       '@radix-ui/react-toast':
         specifier: ^1.2.4
         version: 1.2.4(@types/react-dom@19.0.2(@types/react@19.0.2))(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      '@radix-ui/react-toggle':
+        specifier: ^1.1.2
+        version: 1.1.2(@types/react-dom@19.0.2(@types/react@19.0.2))(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      '@radix-ui/react-toggle-group':
+        specifier: ^1.1.2
+        version: 1.1.2(@types/react-dom@19.0.2(@types/react@19.0.2))(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       '@radix-ui/react-tooltip':
         specifier: ^1.1.6
         version: 1.1.6(@types/react-dom@19.0.2(@types/react@19.0.2))(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
@@ -89,6 +146,9 @@ importers:
       '@types/bcryptjs':
         specifier: ^2.4.6
         version: 2.4.6
+      algoliasearch:
+        specifier: v5
+        version: 5.20.0
       bcryptjs:
         specifier: ^2.4.3
         version: 2.4.3
@@ -98,12 +158,30 @@ importers:
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
+      cmdk:
+        specifier: 1.0.0
+        version: 1.0.0(@types/react-dom@19.0.2(@types/react@19.0.2))(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       date-fns:
         specifier: ^4.1.0
         version: 4.1.0
       geist:
         specifier: ^1.3.1
         version: 1.3.1(next@15.1.3(react-dom@19.0.0(react@19.0.0))(react@19.0.0))
+      instantsearch.css:
+        specifier: ^8.5.1
+        version: 8.5.1
+      instantsearch.js:
+        specifier: ^4.77.1
+        version: 4.77.1(algoliasearch@5.20.0)
+      katex:
+        specifier: ^0.16.21
+        version: 0.16.21
+      lexical:
+        specifier: ^0.27.1
+        version: 0.27.1
+      lodash-es:
+        specifier: ^4.17.21
+        version: 4.17.21
       lucide-react:
         specifier: ^0.469.0
         version: 0.469.0(react@19.0.0)
@@ -122,12 +200,18 @@ importers:
       react:
         specifier: ^19.0.0
         version: 19.0.0
+      react-colorful:
+        specifier: ^5.6.1
+        version: 5.6.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       react-day-picker:
         specifier: 9.5.0
         version: 9.5.0(react@19.0.0)
       react-dom:
         specifier: ^19.0.0
         version: 19.0.0(react@19.0.0)
+      react-error-boundary:
+        specifier: ^5.0.0
+        version: 5.0.0(react@19.0.0)
       react-hook-form:
         specifier: ^7.54.2
         version: 7.54.2(react@19.0.0)
@@ -200,6 +284,61 @@ importers:
         version: 5.7.2
 
 packages:
+
+  '@algolia/client-abtesting@5.20.0':
+    resolution: {integrity: sha512-YaEoNc1Xf2Yk6oCfXXkZ4+dIPLulCx8Ivqj0OsdkHWnsI3aOJChY5qsfyHhDBNSOhqn2ilgHWxSfyZrjxBcAww==}
+    engines: {node: '>= 14.0.0'}
+
+  '@algolia/client-analytics@5.20.0':
+    resolution: {integrity: sha512-CIT9ni0+5sYwqehw+t5cesjho3ugKQjPVy/iPiJvtJX4g8Cdb6je6SPt2uX72cf2ISiXCAX9U3cY0nN0efnRDw==}
+    engines: {node: '>= 14.0.0'}
+
+  '@algolia/client-common@5.20.0':
+    resolution: {integrity: sha512-iSTFT3IU8KNpbAHcBUJw2HUrPnMXeXLyGajmCL7gIzWOsYM4GabZDHXOFx93WGiXMti1dymz8k8R+bfHv1YZmA==}
+    engines: {node: '>= 14.0.0'}
+
+  '@algolia/client-insights@5.20.0':
+    resolution: {integrity: sha512-w9RIojD45z1csvW1vZmAko82fqE/Dm+Ovsy2ElTsjFDB0HMAiLh2FO86hMHbEXDPz6GhHKgGNmBRiRP8dDPgJg==}
+    engines: {node: '>= 14.0.0'}
+
+  '@algolia/client-personalization@5.20.0':
+    resolution: {integrity: sha512-p/hftHhrbiHaEcxubYOzqVV4gUqYWLpTwK+nl2xN3eTrSW9SNuFlAvUBFqPXSVBqc6J5XL9dNKn3y8OA1KElSQ==}
+    engines: {node: '>= 14.0.0'}
+
+  '@algolia/client-query-suggestions@5.20.0':
+    resolution: {integrity: sha512-m4aAuis5vZi7P4gTfiEs6YPrk/9hNTESj3gEmGFgfJw3hO2ubdS4jSId1URd6dGdt0ax2QuapXufcrN58hPUcw==}
+    engines: {node: '>= 14.0.0'}
+
+  '@algolia/client-search@5.20.0':
+    resolution: {integrity: sha512-KL1zWTzrlN4MSiaK1ea560iCA/UewMbS4ZsLQRPoDTWyrbDKVbztkPwwv764LAqgXk0fvkNZvJ3IelcK7DqhjQ==}
+    engines: {node: '>= 14.0.0'}
+
+  '@algolia/events@4.0.1':
+    resolution: {integrity: sha512-FQzvOCgoFXAbf5Y6mYozw2aj5KCJoA3m4heImceldzPSMbdyS4atVjJzXKMsfX3wnZTFYwkkt8/z8UesLHlSBQ==}
+
+  '@algolia/ingestion@1.20.0':
+    resolution: {integrity: sha512-shj2lTdzl9un4XJblrgqg54DoK6JeKFO8K8qInMu4XhE2JuB8De6PUuXAQwiRigZupbI0xq8aM0LKdc9+qiLQA==}
+    engines: {node: '>= 14.0.0'}
+
+  '@algolia/monitoring@1.20.0':
+    resolution: {integrity: sha512-aF9blPwOhKtWvkjyyXh9P5peqmhCA1XxLBRgItT+K6pbT0q4hBDQrCid+pQZJYy4HFUKjB/NDDwyzFhj/rwKhw==}
+    engines: {node: '>= 14.0.0'}
+
+  '@algolia/recommend@5.20.0':
+    resolution: {integrity: sha512-T6B/WPdZR3b89/F9Vvk6QCbt/wrLAtrGoL8z4qPXDFApQ8MuTFWbleN/4rHn6APWO3ps+BUePIEbue2rY5MlRw==}
+    engines: {node: '>= 14.0.0'}
+
+  '@algolia/requester-browser-xhr@5.20.0':
+    resolution: {integrity: sha512-t6//lXsq8E85JMenHrI6mhViipUT5riNhEfCcvtRsTV+KIBpC6Od18eK864dmBhoc5MubM0f+sGpKOqJIlBSCg==}
+    engines: {node: '>= 14.0.0'}
+
+  '@algolia/requester-fetch@5.20.0':
+    resolution: {integrity: sha512-FHxYGqRY+6bgjKsK4aUsTAg6xMs2S21elPe4Y50GB0Y041ihvw41Vlwy2QS6K9ldoftX4JvXodbKTcmuQxywdQ==}
+    engines: {node: '>= 14.0.0'}
+
+  '@algolia/requester-node-http@5.20.0':
+    resolution: {integrity: sha512-kmtQClq/w3vtPteDSPvaW9SPZL/xrIgMrxZyAgsFwrJk0vJxqyC5/hwHmrCraDnStnGSADnLpBf4SpZnwnkwWw==}
+    engines: {node: '>= 14.0.0'}
 
   '@alloc/quick-lru@5.2.0':
     resolution: {integrity: sha512-UrcABB+4bUrFABwbluTIBErXwvbsU/V7TZWfmbgJfbkwiBuziS9gxdODUyuiecfdGQ85jglMW6juS3+z5TsKLw==}
@@ -320,6 +459,12 @@ packages:
   '@eslint/plugin-kit@0.2.4':
     resolution: {integrity: sha512-zSkKow6H5Kdm0ZUQUB2kV5JIXqoG0+uH5YADhaEHswm664N9Db8dXSi0nMJpacpMf+MyyglF1vnZohpEg5yUtg==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+
+  '@excalidraw/excalidraw@0.17.6':
+    resolution: {integrity: sha512-fyCl+zG/Z5yhHDh5Fq2ZGmphcrALmuOdtITm8gN4d8w4ntnaopTXcTfnAAaU3VleDC6LhTkoLOTG6P5kgREiIg==}
+    peerDependencies:
+      react: ^17.0.2 || ^18.2.0
+      react-dom: ^17.0.2 || ^18.2.0
 
   '@floating-ui/core@1.6.8':
     resolution: {integrity: sha512-7XJ9cPU+yI2QeLS+FCSlqNFZJq8arvswefkZrYI1yQBbftw6FyrZOxYSh+9S7z7TpeWlRt9zJ5IhM1WIL334jA==}
@@ -488,6 +633,80 @@ packages:
   '@jridgewell/trace-mapping@0.3.25':
     resolution: {integrity: sha512-vNk6aEwybGtawWmy/PzwnGDOjCkLWSD2wqvjGGAgOAwCGWySYXfYoxt00IJkTF+8Lb57DwOb3Aa0o9CApepiYQ==}
 
+  '@lexical/clipboard@0.27.1':
+    resolution: {integrity: sha512-QmoX77lwDT2VxNljFkpMtQmGGof6Bv9TEv0i9c5403zE/avVm3g9Tk47bClo+Y0NruESwb79VODbdF29pbVKPQ==}
+
+  '@lexical/code@0.27.1':
+    resolution: {integrity: sha512-Z+h9uNHWRg+EfLUMi+STo3hLKPNchr3FzG7amd51U3KqpQ+BDBTIbDe07yPiGfW3CVT++dHuKZPevDuLb0Ukdg==}
+
+  '@lexical/devtools-core@0.27.1':
+    resolution: {integrity: sha512-0GbrNtkyxs7HcdC5i+V6kkNWNCbqyZU3xxDVIFnAi1I1ODTZvgw+qeiw5/nf301mE73+L1As/LNt58Fu+LS99A==}
+    peerDependencies:
+      react: '>=17.x'
+      react-dom: '>=17.x'
+
+  '@lexical/dragon@0.27.1':
+    resolution: {integrity: sha512-drR3Pd/M0T4Z1rBn3eTQY1/xfw3V70ar0U/tXHpP62sL5y8UfcKEvzCixcN5vkkgtGK2iGvQGSCWVnBW0iyARg==}
+
+  '@lexical/file@0.27.1':
+    resolution: {integrity: sha512-PX903PambghTcTWvE7jfLOW9G73iOYRTX3wAOjrcxLtFOriby+x+V1H20p4MqFQ+BpGN46M+tPZfQkoKxy6G8A==}
+
+  '@lexical/hashtag@0.27.1':
+    resolution: {integrity: sha512-ruHxO3Koa4puM5Dopuq4YremoBZyRWUVp0eBTUSZEqQ6dlxlnIhF4gPtnKwW8i3Uftk+xu2c3Vrp0RQvNpipFg==}
+
+  '@lexical/history@0.27.1':
+    resolution: {integrity: sha512-FCjCAJXAfkXoHNjFryAjT381ISsisy646sCBj9n6puR5iDSMmgqqCg3fWuNeWmOUL8XV/pL8KWCKwHCfj4D7KA==}
+
+  '@lexical/html@0.27.1':
+    resolution: {integrity: sha512-WmMPfRurd5BccSmpe+DGZA8N4CDLThek/2/rjaba+zotk9ZTbXktDO5Ie4982V4mZ2VKQfMFflKou6eY8NLcvA==}
+
+  '@lexical/link@0.27.1':
+    resolution: {integrity: sha512-VJ9SOBZSxcuLg5Hgtj3zhxykggzV/iS4aKx4Ggj2ZFGIgvyBVCHrs+jCCqS4GLxR5cEc7m5fkYfNQLXMojjpyg==}
+
+  '@lexical/list@0.27.1':
+    resolution: {integrity: sha512-sCKwRGyRbTyZjF63ENAJPPoVKV6612vcNxRjYmGYQr9R6m834kl9lsa+H5eCDBeYxtQB7eHbDHbYj90Sd1jYHQ==}
+
+  '@lexical/mark@0.27.1':
+    resolution: {integrity: sha512-P2/cgriI5yg9cieaGTtLk66oYYog+JoZ44vYnseH0G7UpGCLXQbapGAnTjQO6UGadZd/WZS4MwXVRoKvAbBOXg==}
+
+  '@lexical/markdown@0.27.1':
+    resolution: {integrity: sha512-gs7g5MDUMFNWFBVjn7jbbYBD28Xfgem8hLoSnT0aUGDbbLtz94XBGweymHUWA4FVdWVoOQ5bV4ogTQsX30gt6w==}
+
+  '@lexical/offset@0.27.1':
+    resolution: {integrity: sha512-Qd4ZZKBk+ZAWNhKAdyX7LJNpl6itQvcjB1KtfL7Ad9Rfpn248p5M95rxXt+QrAe3KcW/bnDPQtxF+DzS2kanIQ==}
+
+  '@lexical/overflow@0.27.1':
+    resolution: {integrity: sha512-ZKcM9M1NYEXKutmbbqAZYNvOSrQtcvZRMzRM/3a+LSuIuaTmJ489AZS/jkagjprpAxvHd3R+wlrMorM0SBU3Ug==}
+
+  '@lexical/plain-text@0.27.1':
+    resolution: {integrity: sha512-94IQmX1bVCC84K8eUVQARNFBBAB8YMRrhUsyhv5Gh0c7ZhEGu+ty5vmAixslDuABChbxGS4czths0DAaiSIHIQ==}
+
+  '@lexical/react@0.27.1':
+    resolution: {integrity: sha512-TSSM619fVWJtIg6e805a8TaI6s4OKXdIgW9J8EkBY78Y0dExJO+2LIE6bK2biSqSdOybCiHOJirmVLV0DadajA==}
+    peerDependencies:
+      react: '>=17.x'
+      react-dom: '>=17.x'
+
+  '@lexical/rich-text@0.27.1':
+    resolution: {integrity: sha512-RtjCHz0406gH2VYL3XW3cxN4xduOegX/wv1S3eVrYq0YAJ/p9ltEfFMSdTvEg2HZbfciRqzeld/EFyVrTuTw/w==}
+
+  '@lexical/selection@0.27.1':
+    resolution: {integrity: sha512-cSaZXE9SXvHMGMa0gbkrlFNXXMDJVu2D0ojwUKaw4HQC79FVXmFj4m1k8htuneu35hU+fiaE8D4fBIZ4/TlESg==}
+
+  '@lexical/table@0.27.1':
+    resolution: {integrity: sha512-+g8MheTEVBCO2E/4ocjJEa4X6A30zYvHO2MPGXJQH30Rm2xeznbC/R84tkqA+uL59SrsJKeFgxrlislXzQZGtg==}
+
+  '@lexical/text@0.27.1':
+    resolution: {integrity: sha512-Ku9e2igZWVD7FtbYMBbM6TOYEYuEfqMbihSy+8sPUvnoCXZnsYTj8HiH+DiZA72QaGPGDyIFvFeTJHFEmDB++A==}
+
+  '@lexical/utils@0.27.1':
+    resolution: {integrity: sha512-llihlrcAFZWB7o22Wnl7/UsXtfMQHwKRnsYPSJuwj1egVG3c3fCRyv5sbD7Xys3rdvuNUHLpSQa812huN11/JQ==}
+
+  '@lexical/yjs@0.27.1':
+    resolution: {integrity: sha512-sF/31k9rpwWRdt/Uz00E3R1eEW1k3Yck65wh8KigN/IZRlSre4Jq7vwHt+xuroIHwTP2A9XozW5CRjRindV81A==}
+    peerDependencies:
+      yjs: '>=13.5.22'
+
   '@next/env@15.1.3':
     resolution: {integrity: sha512-Q1tXwQCGWyA3ehMph3VO+E6xFPHDKdHFYosadt0F78EObYxPio0S09H9UGYznDe6Wc8eLKLG89GqcFJJDiK5xw==}
 
@@ -591,6 +810,9 @@ packages:
 
   '@radix-ui/number@1.1.0':
     resolution: {integrity: sha512-V3gRzhVNU1ldS5XhAPTom1fOIo4ccrjjJgmE+LI2h/WaFpHmx0MQApT+KZHnx8abG6Avtfcz4WoEciMnpFT3HQ==}
+
+  '@radix-ui/primitive@1.0.1':
+    resolution: {integrity: sha512-yQ8oGX2GVsEYMWGxcovu1uGWPCxV5BFfeeYxqPmuAzUyLT9qmaMXSAhXpb0WrspIeqYzdJpkh2vHModJPgRIaw==}
 
   '@radix-ui/primitive@1.1.1':
     resolution: {integrity: sha512-SJ31y+Q/zAyShtXJc8x83i9TYdbAfHZ++tUZnvjJJqFjzsdUnKsxPL6IEtBlxKkU7yzer//GQtZSV4GbldL3YA==}
@@ -699,11 +921,42 @@ packages:
       '@types/react-dom':
         optional: true
 
+  '@radix-ui/react-collection@1.1.2':
+    resolution: {integrity: sha512-9z54IEKRxIa9VityapoEYMuByaG42iSy1ZXlY2KcuLSEtq8x4987/N6m15ppoMffgZX72gER2uHe1D9Y6Unlcw==}
+    peerDependencies:
+      '@types/react': '*'
+      '@types/react-dom': '*'
+      react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+      react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      '@types/react-dom':
+        optional: true
+
+  '@radix-ui/react-compose-refs@1.0.1':
+    resolution: {integrity: sha512-fDSBgd44FKHa1FRMU59qBMPFcl2PZE+2nmqunj+BWFyYYjnhIDWL2ItDs3rrbJDQOtzt5nIebLCQc4QRfz6LJw==}
+    peerDependencies:
+      '@types/react': '*'
+      react: ^16.8 || ^17.0 || ^18.0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+
   '@radix-ui/react-compose-refs@1.1.1':
     resolution: {integrity: sha512-Y9VzoRDSJtgFMUCoiZBDVo084VQ5hfpXxVE+NgkdNsjiDBByiImMZKKhxMwCbdHvhlENG6a833CbFkOQvTricw==}
     peerDependencies:
       '@types/react': '*'
       react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+
+  '@radix-ui/react-context@1.0.1':
+    resolution: {integrity: sha512-ebbrdFoYTcuZ0v4wG5tedGnp9tzcV8awzsxYph7gXUyvnNLuTIcCk1q17JEbnVhXAKG9oX3KtchwiMIAYp9NLg==}
+    peerDependencies:
+      '@types/react': '*'
+      react: ^16.8 || ^17.0 || ^18.0
     peerDependenciesMeta:
       '@types/react':
         optional: true
@@ -715,6 +968,19 @@ packages:
       react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
     peerDependenciesMeta:
       '@types/react':
+        optional: true
+
+  '@radix-ui/react-dialog@1.0.5':
+    resolution: {integrity: sha512-GjWJX/AUpB703eEBanuBnIWdIXg6NvJFCXcNlSZk4xdszCdhrJgBoUd1cGk67vFO+WdA2pfI/plOpqz/5GUP6Q==}
+    peerDependencies:
+      '@types/react': '*'
+      '@types/react-dom': '*'
+      react: ^16.8 || ^17.0 || ^18.0
+      react-dom: ^16.8 || ^17.0 || ^18.0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      '@types/react-dom':
         optional: true
 
   '@radix-ui/react-dialog@1.1.4':
@@ -737,6 +1003,19 @@ packages:
       react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
     peerDependenciesMeta:
       '@types/react':
+        optional: true
+
+  '@radix-ui/react-dismissable-layer@1.0.5':
+    resolution: {integrity: sha512-aJeDjQhywg9LBu2t/At58hCvr7pEm0o2Ke1x33B+MhjNmmZ17sy4KImo0KPLgsnc/zN7GPdce8Cnn0SWvwZO7g==}
+    peerDependencies:
+      '@types/react': '*'
+      '@types/react-dom': '*'
+      react: ^16.8 || ^17.0 || ^18.0
+      react-dom: ^16.8 || ^17.0 || ^18.0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      '@types/react-dom':
         optional: true
 
   '@radix-ui/react-dismissable-layer@1.1.3':
@@ -778,6 +1057,15 @@ packages:
       '@types/react-dom':
         optional: true
 
+  '@radix-ui/react-focus-guards@1.0.1':
+    resolution: {integrity: sha512-Rect2dWbQ8waGzhMavsIbmSVCgYxkXLxxR3ZvCX79JOglzdEy4JXMb98lq4hPxUbLr77nP0UOGf4rcMU+s1pUA==}
+    peerDependencies:
+      '@types/react': '*'
+      react: ^16.8 || ^17.0 || ^18.0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+
   '@radix-ui/react-focus-guards@1.1.1':
     resolution: {integrity: sha512-pSIwfrT1a6sIoDASCSpFwOasEwKTZWDw/iBdtnqKO7v6FeOzYJ7U53cPzYFVR3geGGXgVHaH+CdngrrAzqUGxg==}
     peerDependencies:
@@ -785,6 +1073,19 @@ packages:
       react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
     peerDependenciesMeta:
       '@types/react':
+        optional: true
+
+  '@radix-ui/react-focus-scope@1.0.4':
+    resolution: {integrity: sha512-sL04Mgvf+FmyvZeYfNu1EPAaaxD+aw7cYeIB9L9Fvq8+urhltTRaEo5ysKOpHuKPclsZcSUMKlN05x4u+CINpA==}
+    peerDependencies:
+      '@types/react': '*'
+      '@types/react-dom': '*'
+      react: ^16.8 || ^17.0 || ^18.0
+      react-dom: ^16.8 || ^17.0 || ^18.0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      '@types/react-dom':
         optional: true
 
   '@radix-ui/react-focus-scope@1.1.1':
@@ -811,6 +1112,20 @@ packages:
       '@types/react':
         optional: true
       '@types/react-dom':
+        optional: true
+
+  '@radix-ui/react-icons@1.3.2':
+    resolution: {integrity: sha512-fyQIhGDhzfc9pK2kH6Pl9c4BDJGfMkPqkyIgYDthyNYoNg3wVhoJMMh19WS4Up/1KMPFVpNsT2q3WmXn2N1m6g==}
+    peerDependencies:
+      react: ^16.x || ^17.x || ^18.x || ^19.0.0 || ^19.0.0-rc
+
+  '@radix-ui/react-id@1.0.1':
+    resolution: {integrity: sha512-tI7sT/kqYp8p96yGWY1OAnLHrqDgzHefRBKQ2YAkBS5ja7QLcZ9Z/uY7bEjPUatf8RomoXM8/1sMj1IJaE5UzQ==}
+    peerDependencies:
+      '@types/react': '*'
+      react: ^16.8 || ^17.0 || ^18.0
+    peerDependenciesMeta:
+      '@types/react':
         optional: true
 
   '@radix-ui/react-id@1.1.0':
@@ -887,6 +1202,19 @@ packages:
       '@types/react-dom':
         optional: true
 
+  '@radix-ui/react-portal@1.0.4':
+    resolution: {integrity: sha512-Qki+C/EuGUVCQTOTD5vzJzJuMUlewbzuKyUy+/iHM2uwGiru9gZeBJtHAPKAEkB5KWGi9mP/CHKcY0wt1aW45Q==}
+    peerDependencies:
+      '@types/react': '*'
+      '@types/react-dom': '*'
+      react: ^16.8 || ^17.0 || ^18.0
+      react-dom: ^16.8 || ^17.0 || ^18.0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      '@types/react-dom':
+        optional: true
+
   '@radix-ui/react-portal@1.1.3':
     resolution: {integrity: sha512-NciRqhXnGojhT93RPyDaMPfLH3ZSl4jjIFbZQ1b/vxvZEdHsBZ49wP9w8L3HzUQwep01LcWtkUvm0OVB5JAHTw==}
     peerDependencies:
@@ -894,6 +1222,19 @@ packages:
       '@types/react-dom': '*'
       react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
       react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      '@types/react-dom':
+        optional: true
+
+  '@radix-ui/react-presence@1.0.1':
+    resolution: {integrity: sha512-UXLW4UAbIY5ZjcvzjfRFo5gxva8QirC9hF7wRE4U5gz+TP0DbRk+//qyuAQ1McDxBt1xNMBTaciFGvEmJvAZCg==}
+    peerDependencies:
+      '@types/react': '*'
+      '@types/react-dom': '*'
+      react: ^16.8 || ^17.0 || ^18.0
+      react-dom: ^16.8 || ^17.0 || ^18.0
     peerDependenciesMeta:
       '@types/react':
         optional: true
@@ -913,6 +1254,19 @@ packages:
       '@types/react-dom':
         optional: true
 
+  '@radix-ui/react-primitive@1.0.3':
+    resolution: {integrity: sha512-yi58uVyoAcK/Nq1inRY56ZSjKypBNKTa/1mcL8qdl6oJeEaDbOldlzrGn7P6Q3Id5d+SYNGc5AJgc4vGhjs5+g==}
+    peerDependencies:
+      '@types/react': '*'
+      '@types/react-dom': '*'
+      react: ^16.8 || ^17.0 || ^18.0
+      react-dom: ^16.8 || ^17.0 || ^18.0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      '@types/react-dom':
+        optional: true
+
   '@radix-ui/react-primitive@2.0.1':
     resolution: {integrity: sha512-sHCWTtxwNn3L3fH8qAfnF3WbUZycW93SM1j3NFDzXBiz8D6F5UTTy8G1+WFEaiCdvCVRJWj6N2R4Xq6HdiHmDg==}
     peerDependencies:
@@ -926,8 +1280,47 @@ packages:
       '@types/react-dom':
         optional: true
 
+  '@radix-ui/react-primitive@2.0.2':
+    resolution: {integrity: sha512-Ec/0d38EIuvDF+GZjcMU/Ze6MxntVJYO/fRlCPhCaVUyPY9WTalHJw54tp9sXeJo3tlShWpy41vQRgLRGOuz+w==}
+    peerDependencies:
+      '@types/react': '*'
+      '@types/react-dom': '*'
+      react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+      react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      '@types/react-dom':
+        optional: true
+
   '@radix-ui/react-roving-focus@1.1.1':
     resolution: {integrity: sha512-QE1RoxPGJ/Nm8Qmk0PxP8ojmoaS67i0s7hVssS7KuI2FQoc/uzVlZsqKfQvxPE6D8hICCPHJ4D88zNhT3OOmkw==}
+    peerDependencies:
+      '@types/react': '*'
+      '@types/react-dom': '*'
+      react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+      react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      '@types/react-dom':
+        optional: true
+
+  '@radix-ui/react-roving-focus@1.1.2':
+    resolution: {integrity: sha512-zgMQWkNO169GtGqRvYrzb0Zf8NhMHS2DuEB/TiEmVnpr5OqPU3i8lfbxaAmC2J/KYuIQxyoQQ6DxepyXp61/xw==}
+    peerDependencies:
+      '@types/react': '*'
+      '@types/react-dom': '*'
+      react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+      react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      '@types/react-dom':
+        optional: true
+
+  '@radix-ui/react-scroll-area@1.2.3':
+    resolution: {integrity: sha512-l7+NNBfBYYJa9tNqVcP2AGvxdE3lmE6kFTBXdvHgUaZuy+4wGCL1Cl2AfaR7RKyimj7lZURGLwFO59k4eBnDJQ==}
     peerDependencies:
       '@types/react': '*'
       '@types/react-dom': '*'
@@ -965,8 +1358,26 @@ packages:
       '@types/react-dom':
         optional: true
 
+  '@radix-ui/react-slot@1.0.2':
+    resolution: {integrity: sha512-YeTpuq4deV+6DusvVUW4ivBgnkHwECUu0BiN43L5UCDFgdhsRUWAghhTF5MbvNTPzmiFOx90asDSUjWuCNapwg==}
+    peerDependencies:
+      '@types/react': '*'
+      react: ^16.8 || ^17.0 || ^18.0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+
   '@radix-ui/react-slot@1.1.1':
     resolution: {integrity: sha512-RApLLOcINYJA+dMVbOju7MYv1Mb2EBp2nH4HdDzXTSyaR5optlm6Otrz1euW3HbdOR8UmmFK06TD+A9frYWv+g==}
+    peerDependencies:
+      '@types/react': '*'
+      react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+
+  '@radix-ui/react-slot@1.1.2':
+    resolution: {integrity: sha512-YAKxaiGsSQJ38VzKH86/BPRC4rh+b1Jpa+JneA5LRE7skmLPNAyeG8kPJj/oo4STLvlrs8vkf/iYyc3A5stYCQ==}
     peerDependencies:
       '@types/react': '*'
       react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
@@ -1000,6 +1411,32 @@ packages:
       '@types/react-dom':
         optional: true
 
+  '@radix-ui/react-toggle-group@1.1.2':
+    resolution: {integrity: sha512-JBm6s6aVG/nwuY5eadhU2zDi/IwYS0sDM5ZWb4nymv/hn3hZdkw+gENn0LP4iY1yCd7+bgJaCwueMYJIU3vk4A==}
+    peerDependencies:
+      '@types/react': '*'
+      '@types/react-dom': '*'
+      react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+      react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      '@types/react-dom':
+        optional: true
+
+  '@radix-ui/react-toggle@1.1.2':
+    resolution: {integrity: sha512-lntKchNWx3aCHuWKiDY+8WudiegQvBpDRAYL8dKLRvKEH8VOpl0XX6SSU/bUBqIRJbcTy4+MW06Wv8vgp10rzQ==}
+    peerDependencies:
+      '@types/react': '*'
+      '@types/react-dom': '*'
+      react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+      react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      '@types/react-dom':
+        optional: true
+
   '@radix-ui/react-tooltip@1.1.6':
     resolution: {integrity: sha512-TLB5D8QLExS1uDn7+wH/bjEmRurNMTzNrtq7IjaS4kjion9NtzsTGkvR5+i7yc9q01Pi2KMM2cN3f8UG4IvvXA==}
     peerDependencies:
@@ -1013,11 +1450,29 @@ packages:
       '@types/react-dom':
         optional: true
 
+  '@radix-ui/react-use-callback-ref@1.0.1':
+    resolution: {integrity: sha512-D94LjX4Sp0xJFVaoQOd3OO9k7tpBYNOXdVhkltUbGv2Qb9OXdrg/CpsjlZv7ia14Sylv398LswWBVVu5nqKzAQ==}
+    peerDependencies:
+      '@types/react': '*'
+      react: ^16.8 || ^17.0 || ^18.0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+
   '@radix-ui/react-use-callback-ref@1.1.0':
     resolution: {integrity: sha512-CasTfvsy+frcFkbXtSJ2Zu9JHpN8TYKxkgJGWbjiZhFivxaeW7rMeZt7QELGVLaYVfFMsKHjb7Ak0nMEe+2Vfw==}
     peerDependencies:
       '@types/react': '*'
       react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+
+  '@radix-ui/react-use-controllable-state@1.0.1':
+    resolution: {integrity: sha512-Svl5GY5FQeN758fWKrjM6Qb7asvXeiZltlT4U2gVfl8Gx5UAv2sMR0LWo8yhsIZh2oQ0eFdZ59aoOOMV7b47VA==}
+    peerDependencies:
+      '@types/react': '*'
+      react: ^16.8 || ^17.0 || ^18.0
     peerDependenciesMeta:
       '@types/react':
         optional: true
@@ -1031,11 +1486,29 @@ packages:
       '@types/react':
         optional: true
 
+  '@radix-ui/react-use-escape-keydown@1.0.3':
+    resolution: {integrity: sha512-vyL82j40hcFicA+M4Ex7hVkB9vHgSse1ZWomAqV2Je3RleKGO5iM8KMOEtfoSB0PnIelMd2lATjTGMYqN5ylTg==}
+    peerDependencies:
+      '@types/react': '*'
+      react: ^16.8 || ^17.0 || ^18.0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+
   '@radix-ui/react-use-escape-keydown@1.1.0':
     resolution: {integrity: sha512-L7vwWlR1kTTQ3oh7g1O0CBF3YCyyTj8NmhLR+phShpyA50HCfBFKVJTpshm9PzLiKmehsrQzTYTpX9HvmC9rhw==}
     peerDependencies:
       '@types/react': '*'
       react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+
+  '@radix-ui/react-use-layout-effect@1.0.1':
+    resolution: {integrity: sha512-v/5RegiJWYdoCvMnITBkNNx6bCj20fiaJnWtRkU18yITptraXjffz5Qbn05uOiQnOvi+dbkznkoaMltz1GnszQ==}
+    peerDependencies:
+      '@types/react': '*'
+      react: ^16.8 || ^17.0 || ^18.0
     peerDependenciesMeta:
       '@types/react':
         optional: true
@@ -1171,11 +1644,20 @@ packages:
   '@types/bcryptjs@2.4.6':
     resolution: {integrity: sha512-9xlo6R2qDs5uixm0bcIqCeMCE6HiQsIyel9KQySStiyqNl2tnj2mP3DX1Nf56MD6KMenNNlBBsy3LJ7gUEQPXQ==}
 
+  '@types/dom-speech-recognition@0.0.1':
+    resolution: {integrity: sha512-udCxb8DvjcDKfk1WTBzDsxFbLgYxmQGKrE/ricoMqHRNjSlSUCcamVTA5lIQqzY10mY5qCY0QDwBfFEwhfoDPw==}
+
   '@types/eslint@9.6.1':
     resolution: {integrity: sha512-FXx2pKgId/WyYo2jXw63kk7/+TY7u7AziEJxJAnSFzHlqTAS3Ync6SvgYAN/k4/PQpnnVuzoMuVnByKK2qp0ag==}
 
   '@types/estree@1.0.6':
     resolution: {integrity: sha512-AYnb1nQyY49te+VRAVgmzfcgjYS91mY5P0TKUDCLEM+gNnA+3T6rWITXRLYCpahpqSQbN5cE+gHpnPyXjHWxcw==}
+
+  '@types/google.maps@3.58.1':
+    resolution: {integrity: sha512-X9QTSvGJ0nCfMzYOnaVs/k6/4L+7F5uCS+4iUmkLEls6J9S/Phv+m/i3mDeyc49ZBgwab3EFO1HEoBY7k98EGQ==}
+
+  '@types/hogan.js@3.0.5':
+    resolution: {integrity: sha512-/uRaY3HGPWyLqOyhgvW9Aa43BNnLZrNeQxl2p8wqId4UHMfPKolSB+U7BlZyO1ng7MkLnyEAItsBzCG0SDhqrA==}
 
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
@@ -1185,6 +1667,9 @@ packages:
 
   '@types/node@22.10.5':
     resolution: {integrity: sha512-F8Q+SeGimwOo86fiovQh8qiXfFEh2/ocYv7tU5pJ3EXMSSxk1Joj5wefpFK2fHTf/N6HKGSxIDBT9f3gCxXPkQ==}
+
+  '@types/qs@6.9.18':
+    resolution: {integrity: sha512-kK7dgTYDyGqS+e2Q4aK9X3D7q234CIZ1Bv0q/7Z5IwRDoADNU81xXJK/YVyLbLTZCoIwUoDoffFeF+p/eIklAA==}
 
   '@types/react-dom@19.0.2':
     resolution: {integrity: sha512-c1s+7TKFaDRRxr1TxccIX2u7sfCnc3RxkVyBIUA2lCpyqCF+QoAwQ/CBg7bsMdVwP120HEH143VQezKtef5nCg==}
@@ -1241,6 +1726,9 @@ packages:
     resolution: {integrity: sha512-mCFtBbFBJDCNCWUl5y6sZSCHXw1DEFEk3c/M3nRK2a4XUB8StGFtmcEMizdjKuBzB6e/smJAAWYug3VrdLMr1w==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
+  abbrev@1.1.1:
+    resolution: {integrity: sha512-nne9/IiQ/hzIhY6pdDnbBtz7DjPTKrY00P/zvPSm5pOFkl6xuGrGnXn/VtTNNfNtAfZ9/1RtehkszU9qcTii0Q==}
+
   acorn-jsx@5.3.2:
     resolution: {integrity: sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ==}
     peerDependencies:
@@ -1253,6 +1741,15 @@ packages:
 
   ajv@6.12.6:
     resolution: {integrity: sha512-j3fVLgvTo527anyYyJOGTYJbG+vnnQYvE0m5mmkc1TK+nxAppkCLMIL0aZ4dblVCNoGShhm+kzE4ZUykBoMg4g==}
+
+  algoliasearch-helper@3.23.1:
+    resolution: {integrity: sha512-j/dF2ZELJBm4SJTK5ECsMuCDJpBB8ITiWKRjd3S15bK2bqrXKLWqDiA5A96WhVvCpZ2NmgNlUYmFbKOfcqivbg==}
+    peerDependencies:
+      algoliasearch: '>= 3.1 < 6'
+
+  algoliasearch@5.20.0:
+    resolution: {integrity: sha512-groO71Fvi5SWpxjI9Ia+chy0QBwT61mg6yxJV27f5YFf+Mw+STT75K6SHySpP8Co5LsCrtsbCH5dJZSRtkSKaQ==}
+    engines: {node: '>= 14.0.0'}
 
   ansi-regex@5.0.1:
     resolution: {integrity: sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==}
@@ -1409,6 +1906,12 @@ packages:
     resolution: {integrity: sha512-eYm0QWBtUrBWZWG0d386OGAw16Z995PiOVo2B7bjWSbHedGl5e0ZWaq65kOGgUSNesEIDkB9ISbTg/JK9dhCZA==}
     engines: {node: '>=6'}
 
+  cmdk@1.0.0:
+    resolution: {integrity: sha512-gDzVf0a09TvoJ5jnuPvygTB77+XdOSwEmJ88L6XPFPlv7T3RxbP9jgenfylrAMD0+Le1aO0nVjQUzl2g+vjz5Q==}
+    peerDependencies:
+      react: ^18.0.0
+      react-dom: ^18.0.0
+
   color-convert@2.0.1:
     resolution: {integrity: sha512-RRECPsj7iu/xb5oKYcsFHSppFNnsj/52OVTRKb4zP5onXwVF3zVmmToNcOfGC+CRDpfK/U584fMg38ZHCaElKQ==}
     engines: {node: '>=7.0.0'}
@@ -1430,6 +1933,10 @@ packages:
   commander@4.1.1:
     resolution: {integrity: sha512-NOKm8xhkzAjzFx8B2v5OAHT+u5pRQc2UCa2Vq9jYL/31o2wi9mxBA7LIFs3sV5VSC49z6pEhfbMULvShKj26WA==}
     engines: {node: '>= 6'}
+
+  commander@8.3.0:
+    resolution: {integrity: sha512-OkTL9umf+He2DZkUq8f8J9of7yL6RJKI24dVITBmNfZBmri9zYZQrKkuXiKhyfPSu8tUhnVBB1iKXevvnlR4Ww==}
+    engines: {node: '>= 12'}
 
   concat-map@0.0.1:
     resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
@@ -1847,6 +2354,13 @@ packages:
     resolution: {integrity: sha512-0hJU9SCPvmMzIBdZFqNPXWa6dqh7WdH0cII9y+CyS8rG3nL48Bclra9HmKhVVUHyPWNH5Y7xDwAB7bfgSjkUMQ==}
     engines: {node: '>= 0.4'}
 
+  hogan.js@3.0.2:
+    resolution: {integrity: sha512-RqGs4wavGYJWE07t35JQccByczmNUXQT0E12ZYV1VKYu5UiAU9lsos/yBAcf840+zrUQQxgVduCR5/B8nNtibg==}
+    hasBin: true
+
+  htm@3.1.1:
+    resolution: {integrity: sha512-983Vyg8NwUE7JkZ6NmOqpCZ+sh1bKv2iYTlUkzlWmA5JD2acKoxd4KVxbMmxX/85mtfdnDmTFoNKcg5DGAvxNQ==}
+
   ignore@5.3.2:
     resolution: {integrity: sha512-hsBTNUqQTDwkWtcdYI2i06Y/nUBEsNEDJKjWdigLvegy8kDuJAS8uRlpkkcQpyEXL0Z/pjDy5HBmMjRCJ2gq+g==}
     engines: {node: '>= 4'}
@@ -1858,6 +2372,17 @@ packages:
   imurmurhash@0.1.4:
     resolution: {integrity: sha512-JmXMZ6wuvDmLiHEml9ykzqO6lwFbof0GG4IkcGaENdCRDDmMVnny7s5HsIgHCbaq0w2MyPhDqkhTUgS2LU2PHA==}
     engines: {node: '>=0.8.19'}
+
+  instantsearch-ui-components@0.11.1:
+    resolution: {integrity: sha512-ZqUbJYYgObQ47J08ftXV1KNC1vdEoiD4/49qrkCdW46kRzLxLgYXJGuEuk48DQwK4aBtIoccgTyfbMGfcqNjxg==}
+
+  instantsearch.css@8.5.1:
+    resolution: {integrity: sha512-lu4gWSa2crIA1OAuFwtrNJy4d8oRvKmkY5gv8Dbf3tuedQMm6cf7K+1kXJKRAHLm4pZos9RXIH10m57UfDKbyg==}
+
+  instantsearch.js@4.77.1:
+    resolution: {integrity: sha512-fMW72MIS9IxYbP4UthmnQsAJFPrLp5HwAKJpSzLeOLqv/WmvbHytupoC3/K6X1cTazRNkHHc2Y36yWwyl+5ewA==}
+    peerDependencies:
+      algoliasearch: '>= 3.1 < 6'
 
   internal-slot@1.1.0:
     resolution: {integrity: sha512-4gd7VpWNQNB4UKKCFFVcp1AVv+FMOgs9NKzjHKusc8jTMhd5eL1NqQqOpE0KzMds804/yHlglp3uxgluOqAPLw==}
@@ -1983,6 +2508,9 @@ packages:
   isexe@2.0.0:
     resolution: {integrity: sha512-RHxMLp9lnKHGHRng9QFhRCMbYAcVpn69smSGcq3f36xjgVVWThj4qqLbTLlq7Ssj8B+fIQ1EuCEGI2lKsyQeIw==}
 
+  isomorphic.js@0.2.5:
+    resolution: {integrity: sha512-PIeMbHqMt4DnUP3MA/Flc0HElYjMXArsw1qwJZcm9sqR8mq3l8NYizFMty0pWwE/tzIGH3EKK5+jes5mAr85yw==}
+
   iterator.prototype@1.1.5:
     resolution: {integrity: sha512-H0dkQoCa3b2VEeKQBOxFph+JAbcrQdE7KC0UkqwpLmv2EC4P41QXP+rqo9wYodACiG5/WM5s9oDApTU8utwj9g==}
     engines: {node: '>= 0.4'}
@@ -2028,6 +2556,10 @@ packages:
     resolution: {integrity: sha512-ZZow9HBI5O6EPgSJLUb8n2NKgmVWTwCvHGwFuJlMjvLFqlGG6pjirPhtdsseaLZjSibD8eegzmYpUZwoIlj2cQ==}
     engines: {node: '>=4.0'}
 
+  katex@0.16.21:
+    resolution: {integrity: sha512-XvqR7FgOHtWupfMiigNzmh+MgUVmDGU2kXZm899ZkPfcuoPuFxyHmXsgATDpFZDAXCI8tvinaVcDo8PIIJSo4A==}
+    hasBin: true
+
   keyv@4.5.4:
     resolution: {integrity: sha512-oxVHkHR/EJf2CNXnWxRLW6mg7JyCCUcG0DtEGmL2ctUo1PNTin1PUil+r/+4r5MpVgC/fn1kjsx7mjSujKqIpw==}
 
@@ -2042,6 +2574,14 @@ packages:
     resolution: {integrity: sha512-+bT2uH4E5LGE7h/n3evcS/sQlJXCpIp6ym8OWJ5eV6+67Dsql/LaaT7qJBAt2rzfoa/5QBGBhxDix1dMt2kQKQ==}
     engines: {node: '>= 0.8.0'}
 
+  lexical@0.27.1:
+    resolution: {integrity: sha512-EXlRE/NQO9quKFuz4Z2pu5f48oF8LZOAw0YpN0RmGQx2CbqmEi7SIgO+d+NUKVx9Qs1vX0DL5S7GJpvpZBOE3w==}
+
+  lib0@0.2.99:
+    resolution: {integrity: sha512-vwztYuUf1uf/1zQxfzRfO5yzfNKhTtgOByCruuiQQxWQXnPb8Itaube5ylofcV0oM0aKal9Mv+S1s1Ky0UYP1w==}
+    engines: {node: '>=16'}
+    hasBin: true
+
   lilconfig@3.1.3:
     resolution: {integrity: sha512-/vlFKAoH5Cgt3Ie+JLhRbwOsCQePABiU3tJ1egGvyQ+33R/vcwM2Zl2QR/LzjsBeItPt3oSVXapn+m4nQDvpzw==}
     engines: {node: '>=14'}
@@ -2052,6 +2592,9 @@ packages:
   locate-path@6.0.0:
     resolution: {integrity: sha512-iPZK6eYjbxRu3uB4/WZ3EsEIMJFMqAoopl3R+zuq0UjcAm/MO6KCweDgPfP3elTztoKP3KtnVHxTn2NHBSDVUw==}
     engines: {node: '>=10'}
+
+  lodash-es@4.17.21:
+    resolution: {integrity: sha512-mKnC+QJ9pWVzv+C4/U3rRsHapFfHvQFoFB92e52xeyGMcX6/OlIl78je1u8vePzYZSkkogMPJ2yjxxsb89cxyw==}
 
   lodash.merge@4.6.2:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
@@ -2109,6 +2652,10 @@ packages:
   minipass@7.1.2:
     resolution: {integrity: sha512-qOOzS1cBTWYF4BH8fVePDBOO9iptMnGUEZwNc/cMWnTV2nVLZ7VoNWEPHkYczZA0pdoA7dl6e7FL659nX9S2aw==}
     engines: {node: '>=16 || 14 >=14.17'}
+
+  mkdirp@0.3.0:
+    resolution: {integrity: sha512-OHsdUcVAQ6pOtg5JYWpCBo9W/GySVuwvP9hueRMW7UqshC0tbfzLv8wjySTPm3tfUZ/21CE9E1pJagOA91Pxew==}
+    deprecated: Legacy versions of mkdirp are no longer supported. Please update to mkdirp 1.x. (Note that the API surface has changed to use Promises in 1.x.)
 
   ms@2.1.3:
     resolution: {integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==}
@@ -2169,6 +2716,10 @@ packages:
         optional: true
       sass:
         optional: true
+
+  nopt@1.0.10:
+    resolution: {integrity: sha512-NWmpvLSqUrgrAC9HCuxEvb+PSloHpqVu+FqcO4eeF2h5qYRhA7ev6KvelyQAKtegUbC6RypJnlEOhd8vloNKYg==}
+    hasBin: true
 
   normalize-path@3.0.0:
     resolution: {integrity: sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==}
@@ -2417,6 +2968,10 @@ packages:
     engines: {node: '>=18.18'}
     hasBin: true
 
+  prismjs@1.29.0:
+    resolution: {integrity: sha512-Kx/1w86q/epKcmte75LNrEoT+lX8pBpavuAbvJWRXar7Hz8jrtF+e3vY751p0R8H9HdArwaCTNDDzHg/ScJK1Q==}
+    engines: {node: '>=6'}
+
   prop-types@15.8.1:
     resolution: {integrity: sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==}
 
@@ -2427,8 +2982,18 @@ packages:
     resolution: {integrity: sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg==}
     engines: {node: '>=6'}
 
+  qs@6.9.7:
+    resolution: {integrity: sha512-IhMFgUmuNpyRfxA90umL7ByLlgRXu6tIfKPpF5TmcfRLlLCckfP/g3IQmju6jjpu+Hh8rA+2p6A27ZSPOOHdKw==}
+    engines: {node: '>=0.6'}
+
   queue-microtask@1.2.3:
     resolution: {integrity: sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==}
+
+  react-colorful@5.6.1:
+    resolution: {integrity: sha512-1exovf0uGTGyq5mXQT0zgQ80uvj2PCwvF8zY1RN9/vbJVSjSo3fsB/4L3ObbF7u70NduSiK4xu4Y6q1MHoUGEw==}
+    peerDependencies:
+      react: '>=16.8.0'
+      react-dom: '>=16.8.0'
 
   react-day-picker@9.5.0:
     resolution: {integrity: sha512-WmJnPFVLnKh5Qscm7wavMNg86rqPverSWjx+zgK8/ZmGRSQ8c8OoqW10RI+AzAfT2atIxImpCUU2R9Z7Xb2SUA==}
@@ -2440,6 +3005,17 @@ packages:
     resolution: {integrity: sha512-4GV5sHFG0e/0AD4X+ySy6UJd3jVl1iNsNHdpad0qhABJ11twS3TTBnseqsKurKcsNqCEFeGL3uLpVChpIO3QfQ==}
     peerDependencies:
       react: ^19.0.0
+
+  react-error-boundary@3.1.4:
+    resolution: {integrity: sha512-uM9uPzZJTF6wRQORmSrvOIgt4lJ9MC1sNgEOj2XGsDTRE4kmpWxg7ENK9EWNKJRMAOY9z0MuF4yIfl6gp4sotA==}
+    engines: {node: '>=10', npm: '>=6'}
+    peerDependencies:
+      react: '>=16.13.1'
+
+  react-error-boundary@5.0.0:
+    resolution: {integrity: sha512-tnjAxG+IkpLephNcePNA7v6F/QpWLH8He65+DmedchDwg162JZqx4NmbXj0mlAYVVEd81OW7aFhmbsScYfiAFQ==}
+    peerDependencies:
+      react: '>=16.13.1'
 
   react-hook-form@7.54.2:
     resolution: {integrity: sha512-eHpAUgUjWbZocoQYUHposymRb4ZP6d0uwUnooL2uOybA9/3tPUvoAKqEWK1WaSiTxxOfTpffNZP7QwlnM3/gEg==}
@@ -2456,6 +3032,16 @@ packages:
     peerDependencies:
       '@types/react': '*'
       react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+
+  react-remove-scroll@2.5.5:
+    resolution: {integrity: sha512-ImKhrzJJsyXJfBZ4bzu8Bwpka14c/fQt0k+cyFp/PBhTfyDnU5hjOtM4AG/0AMyy8oKzOTR0lDgJIM7pYXI0kw==}
+    engines: {node: '>=10'}
+    peerDependencies:
+      '@types/react': ^16.8.0 || ^17.0.0 || ^18.0.0
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0
     peerDependenciesMeta:
       '@types/react':
         optional: true
@@ -2539,6 +3125,9 @@ packages:
 
   scheduler@0.25.0:
     resolution: {integrity: sha512-xFVuu11jh+xcO7JOAGJNOXld8/TcEHK/4CituBUeUb5hqxJLj9YuemAEuvm9gQ/+pgXYfbQuqAkiYu+u7YEsNA==}
+
+  search-insights@2.17.3:
+    resolution: {integrity: sha512-RQPdCYTa8A68uM2jwxoY842xDhvx3E5LFL1LxvxCNMev4o5mLuokczhzjAgGwUZBAmOKZknArSxLKmXtIi2AxQ==}
 
   semver@6.3.1:
     resolution: {integrity: sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA==}
@@ -2848,6 +3437,10 @@ packages:
     engines: {node: '>= 14'}
     hasBin: true
 
+  yjs@13.6.24:
+    resolution: {integrity: sha512-xn/pYLTZa3uD1uDG8lpxfLRo5SR/rp0frdASOl2a71aYNvUXdWcLtVL91s2y7j+Q8ppmjZ9H3jsGVgoFMbT2VA==}
+    engines: {node: '>=16.0.0', npm: '>=8.0.0'}
+
   yocto-queue@0.1.0:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
@@ -2856,6 +3449,85 @@ packages:
     resolution: {integrity: sha512-muH7gBL9sI1nciMZV67X5fTKKBLtwpZ5VBp1vsOQzj1MhrBZ4wlVCm3gedKZWLp0Oyel8sIGfeiz54Su+OVT+A==}
 
 snapshots:
+
+  '@algolia/client-abtesting@5.20.0':
+    dependencies:
+      '@algolia/client-common': 5.20.0
+      '@algolia/requester-browser-xhr': 5.20.0
+      '@algolia/requester-fetch': 5.20.0
+      '@algolia/requester-node-http': 5.20.0
+
+  '@algolia/client-analytics@5.20.0':
+    dependencies:
+      '@algolia/client-common': 5.20.0
+      '@algolia/requester-browser-xhr': 5.20.0
+      '@algolia/requester-fetch': 5.20.0
+      '@algolia/requester-node-http': 5.20.0
+
+  '@algolia/client-common@5.20.0': {}
+
+  '@algolia/client-insights@5.20.0':
+    dependencies:
+      '@algolia/client-common': 5.20.0
+      '@algolia/requester-browser-xhr': 5.20.0
+      '@algolia/requester-fetch': 5.20.0
+      '@algolia/requester-node-http': 5.20.0
+
+  '@algolia/client-personalization@5.20.0':
+    dependencies:
+      '@algolia/client-common': 5.20.0
+      '@algolia/requester-browser-xhr': 5.20.0
+      '@algolia/requester-fetch': 5.20.0
+      '@algolia/requester-node-http': 5.20.0
+
+  '@algolia/client-query-suggestions@5.20.0':
+    dependencies:
+      '@algolia/client-common': 5.20.0
+      '@algolia/requester-browser-xhr': 5.20.0
+      '@algolia/requester-fetch': 5.20.0
+      '@algolia/requester-node-http': 5.20.0
+
+  '@algolia/client-search@5.20.0':
+    dependencies:
+      '@algolia/client-common': 5.20.0
+      '@algolia/requester-browser-xhr': 5.20.0
+      '@algolia/requester-fetch': 5.20.0
+      '@algolia/requester-node-http': 5.20.0
+
+  '@algolia/events@4.0.1': {}
+
+  '@algolia/ingestion@1.20.0':
+    dependencies:
+      '@algolia/client-common': 5.20.0
+      '@algolia/requester-browser-xhr': 5.20.0
+      '@algolia/requester-fetch': 5.20.0
+      '@algolia/requester-node-http': 5.20.0
+
+  '@algolia/monitoring@1.20.0':
+    dependencies:
+      '@algolia/client-common': 5.20.0
+      '@algolia/requester-browser-xhr': 5.20.0
+      '@algolia/requester-fetch': 5.20.0
+      '@algolia/requester-node-http': 5.20.0
+
+  '@algolia/recommend@5.20.0':
+    dependencies:
+      '@algolia/client-common': 5.20.0
+      '@algolia/requester-browser-xhr': 5.20.0
+      '@algolia/requester-fetch': 5.20.0
+      '@algolia/requester-node-http': 5.20.0
+
+  '@algolia/requester-browser-xhr@5.20.0':
+    dependencies:
+      '@algolia/client-common': 5.20.0
+
+  '@algolia/requester-fetch@5.20.0':
+    dependencies:
+      '@algolia/client-common': 5.20.0
+
+  '@algolia/requester-node-http@5.20.0':
+    dependencies:
+      '@algolia/client-common': 5.20.0
 
   '@alloc/quick-lru@5.2.0': {}
 
@@ -2962,6 +3634,11 @@ snapshots:
   '@eslint/plugin-kit@0.2.4':
     dependencies:
       levn: 0.4.1
+
+  '@excalidraw/excalidraw@0.17.6(react-dom@19.0.0(react@19.0.0))(react@19.0.0)':
+    dependencies:
+      react: 19.0.0
+      react-dom: 19.0.0(react@19.0.0)
 
   '@floating-ui/core@1.6.8':
     dependencies:
@@ -3098,6 +3775,157 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.0
 
+  '@lexical/clipboard@0.27.1':
+    dependencies:
+      '@lexical/html': 0.27.1
+      '@lexical/list': 0.27.1
+      '@lexical/selection': 0.27.1
+      '@lexical/utils': 0.27.1
+      lexical: 0.27.1
+
+  '@lexical/code@0.27.1':
+    dependencies:
+      '@lexical/utils': 0.27.1
+      lexical: 0.27.1
+      prismjs: 1.29.0
+
+  '@lexical/devtools-core@0.27.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0)':
+    dependencies:
+      '@lexical/html': 0.27.1
+      '@lexical/link': 0.27.1
+      '@lexical/mark': 0.27.1
+      '@lexical/table': 0.27.1
+      '@lexical/utils': 0.27.1
+      lexical: 0.27.1
+      react: 19.0.0
+      react-dom: 19.0.0(react@19.0.0)
+
+  '@lexical/dragon@0.27.1':
+    dependencies:
+      lexical: 0.27.1
+
+  '@lexical/file@0.27.1':
+    dependencies:
+      lexical: 0.27.1
+
+  '@lexical/hashtag@0.27.1':
+    dependencies:
+      '@lexical/utils': 0.27.1
+      lexical: 0.27.1
+
+  '@lexical/history@0.27.1':
+    dependencies:
+      '@lexical/utils': 0.27.1
+      lexical: 0.27.1
+
+  '@lexical/html@0.27.1':
+    dependencies:
+      '@lexical/selection': 0.27.1
+      '@lexical/utils': 0.27.1
+      lexical: 0.27.1
+
+  '@lexical/link@0.27.1':
+    dependencies:
+      '@lexical/utils': 0.27.1
+      lexical: 0.27.1
+
+  '@lexical/list@0.27.1':
+    dependencies:
+      '@lexical/utils': 0.27.1
+      lexical: 0.27.1
+
+  '@lexical/mark@0.27.1':
+    dependencies:
+      '@lexical/utils': 0.27.1
+      lexical: 0.27.1
+
+  '@lexical/markdown@0.27.1':
+    dependencies:
+      '@lexical/code': 0.27.1
+      '@lexical/link': 0.27.1
+      '@lexical/list': 0.27.1
+      '@lexical/rich-text': 0.27.1
+      '@lexical/text': 0.27.1
+      '@lexical/utils': 0.27.1
+      lexical: 0.27.1
+
+  '@lexical/offset@0.27.1':
+    dependencies:
+      lexical: 0.27.1
+
+  '@lexical/overflow@0.27.1':
+    dependencies:
+      lexical: 0.27.1
+
+  '@lexical/plain-text@0.27.1':
+    dependencies:
+      '@lexical/clipboard': 0.27.1
+      '@lexical/selection': 0.27.1
+      '@lexical/utils': 0.27.1
+      lexical: 0.27.1
+
+  '@lexical/react@0.27.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(yjs@13.6.24)':
+    dependencies:
+      '@lexical/clipboard': 0.27.1
+      '@lexical/code': 0.27.1
+      '@lexical/devtools-core': 0.27.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      '@lexical/dragon': 0.27.1
+      '@lexical/hashtag': 0.27.1
+      '@lexical/history': 0.27.1
+      '@lexical/link': 0.27.1
+      '@lexical/list': 0.27.1
+      '@lexical/mark': 0.27.1
+      '@lexical/markdown': 0.27.1
+      '@lexical/overflow': 0.27.1
+      '@lexical/plain-text': 0.27.1
+      '@lexical/rich-text': 0.27.1
+      '@lexical/selection': 0.27.1
+      '@lexical/table': 0.27.1
+      '@lexical/text': 0.27.1
+      '@lexical/utils': 0.27.1
+      '@lexical/yjs': 0.27.1(yjs@13.6.24)
+      lexical: 0.27.1
+      react: 19.0.0
+      react-dom: 19.0.0(react@19.0.0)
+      react-error-boundary: 3.1.4(react@19.0.0)
+    transitivePeerDependencies:
+      - yjs
+
+  '@lexical/rich-text@0.27.1':
+    dependencies:
+      '@lexical/clipboard': 0.27.1
+      '@lexical/selection': 0.27.1
+      '@lexical/utils': 0.27.1
+      lexical: 0.27.1
+
+  '@lexical/selection@0.27.1':
+    dependencies:
+      lexical: 0.27.1
+
+  '@lexical/table@0.27.1':
+    dependencies:
+      '@lexical/clipboard': 0.27.1
+      '@lexical/utils': 0.27.1
+      lexical: 0.27.1
+
+  '@lexical/text@0.27.1':
+    dependencies:
+      lexical: 0.27.1
+
+  '@lexical/utils@0.27.1':
+    dependencies:
+      '@lexical/list': 0.27.1
+      '@lexical/selection': 0.27.1
+      '@lexical/table': 0.27.1
+      lexical: 0.27.1
+
+  '@lexical/yjs@0.27.1(yjs@13.6.24)':
+    dependencies:
+      '@lexical/offset': 0.27.1
+      '@lexical/selection': 0.27.1
+      lexical: 0.27.1
+      yjs: 13.6.24
+
   '@next/env@15.1.3': {}
 
   '@next/eslint-plugin-next@15.1.3':
@@ -3173,6 +4001,10 @@ snapshots:
       '@prisma/debug': 6.1.0
 
   '@radix-ui/number@1.1.0': {}
+
+  '@radix-ui/primitive@1.0.1':
+    dependencies:
+      '@babel/runtime': 7.26.0
 
   '@radix-ui/primitive@1.1.1': {}
 
@@ -3281,8 +4113,34 @@ snapshots:
       '@types/react': 19.0.2
       '@types/react-dom': 19.0.2(@types/react@19.0.2)
 
+  '@radix-ui/react-collection@1.1.2(@types/react-dom@19.0.2(@types/react@19.0.2))(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)':
+    dependencies:
+      '@radix-ui/react-compose-refs': 1.1.1(@types/react@19.0.2)(react@19.0.0)
+      '@radix-ui/react-context': 1.1.1(@types/react@19.0.2)(react@19.0.0)
+      '@radix-ui/react-primitive': 2.0.2(@types/react-dom@19.0.2(@types/react@19.0.2))(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      '@radix-ui/react-slot': 1.1.2(@types/react@19.0.2)(react@19.0.0)
+      react: 19.0.0
+      react-dom: 19.0.0(react@19.0.0)
+    optionalDependencies:
+      '@types/react': 19.0.2
+      '@types/react-dom': 19.0.2(@types/react@19.0.2)
+
+  '@radix-ui/react-compose-refs@1.0.1(@types/react@19.0.2)(react@19.0.0)':
+    dependencies:
+      '@babel/runtime': 7.26.0
+      react: 19.0.0
+    optionalDependencies:
+      '@types/react': 19.0.2
+
   '@radix-ui/react-compose-refs@1.1.1(@types/react@19.0.2)(react@19.0.0)':
     dependencies:
+      react: 19.0.0
+    optionalDependencies:
+      '@types/react': 19.0.2
+
+  '@radix-ui/react-context@1.0.1(@types/react@19.0.2)(react@19.0.0)':
+    dependencies:
+      '@babel/runtime': 7.26.0
       react: 19.0.0
     optionalDependencies:
       '@types/react': 19.0.2
@@ -3292,6 +4150,29 @@ snapshots:
       react: 19.0.0
     optionalDependencies:
       '@types/react': 19.0.2
+
+  '@radix-ui/react-dialog@1.0.5(@types/react-dom@19.0.2(@types/react@19.0.2))(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)':
+    dependencies:
+      '@babel/runtime': 7.26.0
+      '@radix-ui/primitive': 1.0.1
+      '@radix-ui/react-compose-refs': 1.0.1(@types/react@19.0.2)(react@19.0.0)
+      '@radix-ui/react-context': 1.0.1(@types/react@19.0.2)(react@19.0.0)
+      '@radix-ui/react-dismissable-layer': 1.0.5(@types/react-dom@19.0.2(@types/react@19.0.2))(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      '@radix-ui/react-focus-guards': 1.0.1(@types/react@19.0.2)(react@19.0.0)
+      '@radix-ui/react-focus-scope': 1.0.4(@types/react-dom@19.0.2(@types/react@19.0.2))(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      '@radix-ui/react-id': 1.0.1(@types/react@19.0.2)(react@19.0.0)
+      '@radix-ui/react-portal': 1.0.4(@types/react-dom@19.0.2(@types/react@19.0.2))(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      '@radix-ui/react-presence': 1.0.1(@types/react-dom@19.0.2(@types/react@19.0.2))(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      '@radix-ui/react-primitive': 1.0.3(@types/react-dom@19.0.2(@types/react@19.0.2))(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      '@radix-ui/react-slot': 1.0.2(@types/react@19.0.2)(react@19.0.0)
+      '@radix-ui/react-use-controllable-state': 1.0.1(@types/react@19.0.2)(react@19.0.0)
+      aria-hidden: 1.2.4
+      react: 19.0.0
+      react-dom: 19.0.0(react@19.0.0)
+      react-remove-scroll: 2.5.5(@types/react@19.0.2)(react@19.0.0)
+    optionalDependencies:
+      '@types/react': 19.0.2
+      '@types/react-dom': 19.0.2(@types/react@19.0.2)
 
   '@radix-ui/react-dialog@1.1.4(@types/react-dom@19.0.2(@types/react@19.0.2))(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)':
     dependencies:
@@ -3320,6 +4201,20 @@ snapshots:
       react: 19.0.0
     optionalDependencies:
       '@types/react': 19.0.2
+
+  '@radix-ui/react-dismissable-layer@1.0.5(@types/react-dom@19.0.2(@types/react@19.0.2))(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)':
+    dependencies:
+      '@babel/runtime': 7.26.0
+      '@radix-ui/primitive': 1.0.1
+      '@radix-ui/react-compose-refs': 1.0.1(@types/react@19.0.2)(react@19.0.0)
+      '@radix-ui/react-primitive': 1.0.3(@types/react-dom@19.0.2(@types/react@19.0.2))(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      '@radix-ui/react-use-callback-ref': 1.0.1(@types/react@19.0.2)(react@19.0.0)
+      '@radix-ui/react-use-escape-keydown': 1.0.3(@types/react@19.0.2)(react@19.0.0)
+      react: 19.0.0
+      react-dom: 19.0.0(react@19.0.0)
+    optionalDependencies:
+      '@types/react': 19.0.2
+      '@types/react-dom': 19.0.2(@types/react@19.0.2)
 
   '@radix-ui/react-dismissable-layer@1.1.3(@types/react-dom@19.0.2(@types/react@19.0.2))(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)':
     dependencies:
@@ -3362,11 +4257,30 @@ snapshots:
       '@types/react': 19.0.2
       '@types/react-dom': 19.0.2(@types/react@19.0.2)
 
+  '@radix-ui/react-focus-guards@1.0.1(@types/react@19.0.2)(react@19.0.0)':
+    dependencies:
+      '@babel/runtime': 7.26.0
+      react: 19.0.0
+    optionalDependencies:
+      '@types/react': 19.0.2
+
   '@radix-ui/react-focus-guards@1.1.1(@types/react@19.0.2)(react@19.0.0)':
     dependencies:
       react: 19.0.0
     optionalDependencies:
       '@types/react': 19.0.2
+
+  '@radix-ui/react-focus-scope@1.0.4(@types/react-dom@19.0.2(@types/react@19.0.2))(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)':
+    dependencies:
+      '@babel/runtime': 7.26.0
+      '@radix-ui/react-compose-refs': 1.0.1(@types/react@19.0.2)(react@19.0.0)
+      '@radix-ui/react-primitive': 1.0.3(@types/react-dom@19.0.2(@types/react@19.0.2))(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      '@radix-ui/react-use-callback-ref': 1.0.1(@types/react@19.0.2)(react@19.0.0)
+      react: 19.0.0
+      react-dom: 19.0.0(react@19.0.0)
+    optionalDependencies:
+      '@types/react': 19.0.2
+      '@types/react-dom': 19.0.2(@types/react@19.0.2)
 
   '@radix-ui/react-focus-scope@1.1.1(@types/react-dom@19.0.2(@types/react@19.0.2))(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)':
     dependencies:
@@ -3395,6 +4309,18 @@ snapshots:
     optionalDependencies:
       '@types/react': 19.0.2
       '@types/react-dom': 19.0.2(@types/react@19.0.2)
+
+  '@radix-ui/react-icons@1.3.2(react@19.0.0)':
+    dependencies:
+      react: 19.0.0
+
+  '@radix-ui/react-id@1.0.1(@types/react@19.0.2)(react@19.0.0)':
+    dependencies:
+      '@babel/runtime': 7.26.0
+      '@radix-ui/react-use-layout-effect': 1.0.1(@types/react@19.0.2)(react@19.0.0)
+      react: 19.0.0
+    optionalDependencies:
+      '@types/react': 19.0.2
 
   '@radix-ui/react-id@1.1.0(@types/react@19.0.2)(react@19.0.0)':
     dependencies:
@@ -3501,10 +4427,31 @@ snapshots:
       '@types/react': 19.0.2
       '@types/react-dom': 19.0.2(@types/react@19.0.2)
 
+  '@radix-ui/react-portal@1.0.4(@types/react-dom@19.0.2(@types/react@19.0.2))(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)':
+    dependencies:
+      '@babel/runtime': 7.26.0
+      '@radix-ui/react-primitive': 1.0.3(@types/react-dom@19.0.2(@types/react@19.0.2))(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      react: 19.0.0
+      react-dom: 19.0.0(react@19.0.0)
+    optionalDependencies:
+      '@types/react': 19.0.2
+      '@types/react-dom': 19.0.2(@types/react@19.0.2)
+
   '@radix-ui/react-portal@1.1.3(@types/react-dom@19.0.2(@types/react@19.0.2))(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)':
     dependencies:
       '@radix-ui/react-primitive': 2.0.1(@types/react-dom@19.0.2(@types/react@19.0.2))(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       '@radix-ui/react-use-layout-effect': 1.1.0(@types/react@19.0.2)(react@19.0.0)
+      react: 19.0.0
+      react-dom: 19.0.0(react@19.0.0)
+    optionalDependencies:
+      '@types/react': 19.0.2
+      '@types/react-dom': 19.0.2(@types/react@19.0.2)
+
+  '@radix-ui/react-presence@1.0.1(@types/react-dom@19.0.2(@types/react@19.0.2))(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)':
+    dependencies:
+      '@babel/runtime': 7.26.0
+      '@radix-ui/react-compose-refs': 1.0.1(@types/react@19.0.2)(react@19.0.0)
+      '@radix-ui/react-use-layout-effect': 1.0.1(@types/react@19.0.2)(react@19.0.0)
       react: 19.0.0
       react-dom: 19.0.0(react@19.0.0)
     optionalDependencies:
@@ -3521,9 +4468,28 @@ snapshots:
       '@types/react': 19.0.2
       '@types/react-dom': 19.0.2(@types/react@19.0.2)
 
+  '@radix-ui/react-primitive@1.0.3(@types/react-dom@19.0.2(@types/react@19.0.2))(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)':
+    dependencies:
+      '@babel/runtime': 7.26.0
+      '@radix-ui/react-slot': 1.0.2(@types/react@19.0.2)(react@19.0.0)
+      react: 19.0.0
+      react-dom: 19.0.0(react@19.0.0)
+    optionalDependencies:
+      '@types/react': 19.0.2
+      '@types/react-dom': 19.0.2(@types/react@19.0.2)
+
   '@radix-ui/react-primitive@2.0.1(@types/react-dom@19.0.2(@types/react@19.0.2))(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)':
     dependencies:
       '@radix-ui/react-slot': 1.1.1(@types/react@19.0.2)(react@19.0.0)
+      react: 19.0.0
+      react-dom: 19.0.0(react@19.0.0)
+    optionalDependencies:
+      '@types/react': 19.0.2
+      '@types/react-dom': 19.0.2(@types/react@19.0.2)
+
+  '@radix-ui/react-primitive@2.0.2(@types/react-dom@19.0.2(@types/react@19.0.2))(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)':
+    dependencies:
+      '@radix-ui/react-slot': 1.1.2(@types/react@19.0.2)(react@19.0.0)
       react: 19.0.0
       react-dom: 19.0.0(react@19.0.0)
     optionalDependencies:
@@ -3541,6 +4507,40 @@ snapshots:
       '@radix-ui/react-primitive': 2.0.1(@types/react-dom@19.0.2(@types/react@19.0.2))(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       '@radix-ui/react-use-callback-ref': 1.1.0(@types/react@19.0.2)(react@19.0.0)
       '@radix-ui/react-use-controllable-state': 1.1.0(@types/react@19.0.2)(react@19.0.0)
+      react: 19.0.0
+      react-dom: 19.0.0(react@19.0.0)
+    optionalDependencies:
+      '@types/react': 19.0.2
+      '@types/react-dom': 19.0.2(@types/react@19.0.2)
+
+  '@radix-ui/react-roving-focus@1.1.2(@types/react-dom@19.0.2(@types/react@19.0.2))(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)':
+    dependencies:
+      '@radix-ui/primitive': 1.1.1
+      '@radix-ui/react-collection': 1.1.2(@types/react-dom@19.0.2(@types/react@19.0.2))(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      '@radix-ui/react-compose-refs': 1.1.1(@types/react@19.0.2)(react@19.0.0)
+      '@radix-ui/react-context': 1.1.1(@types/react@19.0.2)(react@19.0.0)
+      '@radix-ui/react-direction': 1.1.0(@types/react@19.0.2)(react@19.0.0)
+      '@radix-ui/react-id': 1.1.0(@types/react@19.0.2)(react@19.0.0)
+      '@radix-ui/react-primitive': 2.0.2(@types/react-dom@19.0.2(@types/react@19.0.2))(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      '@radix-ui/react-use-callback-ref': 1.1.0(@types/react@19.0.2)(react@19.0.0)
+      '@radix-ui/react-use-controllable-state': 1.1.0(@types/react@19.0.2)(react@19.0.0)
+      react: 19.0.0
+      react-dom: 19.0.0(react@19.0.0)
+    optionalDependencies:
+      '@types/react': 19.0.2
+      '@types/react-dom': 19.0.2(@types/react@19.0.2)
+
+  '@radix-ui/react-scroll-area@1.2.3(@types/react-dom@19.0.2(@types/react@19.0.2))(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)':
+    dependencies:
+      '@radix-ui/number': 1.1.0
+      '@radix-ui/primitive': 1.1.1
+      '@radix-ui/react-compose-refs': 1.1.1(@types/react@19.0.2)(react@19.0.0)
+      '@radix-ui/react-context': 1.1.1(@types/react@19.0.2)(react@19.0.0)
+      '@radix-ui/react-direction': 1.1.0(@types/react@19.0.2)(react@19.0.0)
+      '@radix-ui/react-presence': 1.1.2(@types/react-dom@19.0.2(@types/react@19.0.2))(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      '@radix-ui/react-primitive': 2.0.2(@types/react-dom@19.0.2(@types/react@19.0.2))(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      '@radix-ui/react-use-callback-ref': 1.1.0(@types/react@19.0.2)(react@19.0.0)
+      '@radix-ui/react-use-layout-effect': 1.1.0(@types/react@19.0.2)(react@19.0.0)
       react: 19.0.0
       react-dom: 19.0.0(react@19.0.0)
     optionalDependencies:
@@ -3585,7 +4585,22 @@ snapshots:
       '@types/react': 19.0.2
       '@types/react-dom': 19.0.2(@types/react@19.0.2)
 
+  '@radix-ui/react-slot@1.0.2(@types/react@19.0.2)(react@19.0.0)':
+    dependencies:
+      '@babel/runtime': 7.26.0
+      '@radix-ui/react-compose-refs': 1.0.1(@types/react@19.0.2)(react@19.0.0)
+      react: 19.0.0
+    optionalDependencies:
+      '@types/react': 19.0.2
+
   '@radix-ui/react-slot@1.1.1(@types/react@19.0.2)(react@19.0.0)':
+    dependencies:
+      '@radix-ui/react-compose-refs': 1.1.1(@types/react@19.0.2)(react@19.0.0)
+      react: 19.0.0
+    optionalDependencies:
+      '@types/react': 19.0.2
+
+  '@radix-ui/react-slot@1.1.2(@types/react@19.0.2)(react@19.0.0)':
     dependencies:
       '@radix-ui/react-compose-refs': 1.1.1(@types/react@19.0.2)(react@19.0.0)
       react: 19.0.0
@@ -3628,6 +4643,32 @@ snapshots:
       '@types/react': 19.0.2
       '@types/react-dom': 19.0.2(@types/react@19.0.2)
 
+  '@radix-ui/react-toggle-group@1.1.2(@types/react-dom@19.0.2(@types/react@19.0.2))(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)':
+    dependencies:
+      '@radix-ui/primitive': 1.1.1
+      '@radix-ui/react-context': 1.1.1(@types/react@19.0.2)(react@19.0.0)
+      '@radix-ui/react-direction': 1.1.0(@types/react@19.0.2)(react@19.0.0)
+      '@radix-ui/react-primitive': 2.0.2(@types/react-dom@19.0.2(@types/react@19.0.2))(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      '@radix-ui/react-roving-focus': 1.1.2(@types/react-dom@19.0.2(@types/react@19.0.2))(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      '@radix-ui/react-toggle': 1.1.2(@types/react-dom@19.0.2(@types/react@19.0.2))(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      '@radix-ui/react-use-controllable-state': 1.1.0(@types/react@19.0.2)(react@19.0.0)
+      react: 19.0.0
+      react-dom: 19.0.0(react@19.0.0)
+    optionalDependencies:
+      '@types/react': 19.0.2
+      '@types/react-dom': 19.0.2(@types/react@19.0.2)
+
+  '@radix-ui/react-toggle@1.1.2(@types/react-dom@19.0.2(@types/react@19.0.2))(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)':
+    dependencies:
+      '@radix-ui/primitive': 1.1.1
+      '@radix-ui/react-primitive': 2.0.2(@types/react-dom@19.0.2(@types/react@19.0.2))(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      '@radix-ui/react-use-controllable-state': 1.1.0(@types/react@19.0.2)(react@19.0.0)
+      react: 19.0.0
+      react-dom: 19.0.0(react@19.0.0)
+    optionalDependencies:
+      '@types/react': 19.0.2
+      '@types/react-dom': 19.0.2(@types/react@19.0.2)
+
   '@radix-ui/react-tooltip@1.1.6(@types/react-dom@19.0.2(@types/react@19.0.2))(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)':
     dependencies:
       '@radix-ui/primitive': 1.1.1
@@ -3648,8 +4689,23 @@ snapshots:
       '@types/react': 19.0.2
       '@types/react-dom': 19.0.2(@types/react@19.0.2)
 
+  '@radix-ui/react-use-callback-ref@1.0.1(@types/react@19.0.2)(react@19.0.0)':
+    dependencies:
+      '@babel/runtime': 7.26.0
+      react: 19.0.0
+    optionalDependencies:
+      '@types/react': 19.0.2
+
   '@radix-ui/react-use-callback-ref@1.1.0(@types/react@19.0.2)(react@19.0.0)':
     dependencies:
+      react: 19.0.0
+    optionalDependencies:
+      '@types/react': 19.0.2
+
+  '@radix-ui/react-use-controllable-state@1.0.1(@types/react@19.0.2)(react@19.0.0)':
+    dependencies:
+      '@babel/runtime': 7.26.0
+      '@radix-ui/react-use-callback-ref': 1.0.1(@types/react@19.0.2)(react@19.0.0)
       react: 19.0.0
     optionalDependencies:
       '@types/react': 19.0.2
@@ -3661,9 +4717,24 @@ snapshots:
     optionalDependencies:
       '@types/react': 19.0.2
 
+  '@radix-ui/react-use-escape-keydown@1.0.3(@types/react@19.0.2)(react@19.0.0)':
+    dependencies:
+      '@babel/runtime': 7.26.0
+      '@radix-ui/react-use-callback-ref': 1.0.1(@types/react@19.0.2)(react@19.0.0)
+      react: 19.0.0
+    optionalDependencies:
+      '@types/react': 19.0.2
+
   '@radix-ui/react-use-escape-keydown@1.1.0(@types/react@19.0.2)(react@19.0.0)':
     dependencies:
       '@radix-ui/react-use-callback-ref': 1.1.0(@types/react@19.0.2)(react@19.0.0)
+      react: 19.0.0
+    optionalDependencies:
+      '@types/react': 19.0.2
+
+  '@radix-ui/react-use-layout-effect@1.0.1(@types/react@19.0.2)(react@19.0.0)':
+    dependencies:
+      '@babel/runtime': 7.26.0
       react: 19.0.0
     optionalDependencies:
       '@types/react': 19.0.2
@@ -3767,12 +4838,18 @@ snapshots:
 
   '@types/bcryptjs@2.4.6': {}
 
+  '@types/dom-speech-recognition@0.0.1': {}
+
   '@types/eslint@9.6.1':
     dependencies:
       '@types/estree': 1.0.6
       '@types/json-schema': 7.0.15
 
   '@types/estree@1.0.6': {}
+
+  '@types/google.maps@3.58.1': {}
+
+  '@types/hogan.js@3.0.5': {}
 
   '@types/json-schema@7.0.15': {}
 
@@ -3781,6 +4858,8 @@ snapshots:
   '@types/node@22.10.5':
     dependencies:
       undici-types: 6.20.0
+
+  '@types/qs@6.9.18': {}
 
   '@types/react-dom@19.0.2(@types/react@19.0.2)':
     dependencies:
@@ -3867,6 +4946,8 @@ snapshots:
       '@typescript-eslint/types': 8.19.0
       eslint-visitor-keys: 4.2.0
 
+  abbrev@1.1.1: {}
+
   acorn-jsx@5.3.2(acorn@8.14.0):
     dependencies:
       acorn: 8.14.0
@@ -3879,6 +4960,27 @@ snapshots:
       fast-json-stable-stringify: 2.1.0
       json-schema-traverse: 0.4.1
       uri-js: 4.4.1
+
+  algoliasearch-helper@3.23.1(algoliasearch@5.20.0):
+    dependencies:
+      '@algolia/events': 4.0.1
+      algoliasearch: 5.20.0
+
+  algoliasearch@5.20.0:
+    dependencies:
+      '@algolia/client-abtesting': 5.20.0
+      '@algolia/client-analytics': 5.20.0
+      '@algolia/client-common': 5.20.0
+      '@algolia/client-insights': 5.20.0
+      '@algolia/client-personalization': 5.20.0
+      '@algolia/client-query-suggestions': 5.20.0
+      '@algolia/client-search': 5.20.0
+      '@algolia/ingestion': 1.20.0
+      '@algolia/monitoring': 1.20.0
+      '@algolia/recommend': 5.20.0
+      '@algolia/requester-browser-xhr': 5.20.0
+      '@algolia/requester-fetch': 5.20.0
+      '@algolia/requester-node-http': 5.20.0
 
   ansi-regex@5.0.1: {}
 
@@ -4062,6 +5164,16 @@ snapshots:
 
   clsx@2.1.1: {}
 
+  cmdk@1.0.0(@types/react-dom@19.0.2(@types/react@19.0.2))(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0):
+    dependencies:
+      '@radix-ui/react-dialog': 1.0.5(@types/react-dom@19.0.2(@types/react@19.0.2))(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      '@radix-ui/react-primitive': 1.0.3(@types/react-dom@19.0.2(@types/react@19.0.2))(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      react: 19.0.0
+      react-dom: 19.0.0(react@19.0.0)
+    transitivePeerDependencies:
+      - '@types/react'
+      - '@types/react-dom'
+
   color-convert@2.0.1:
     dependencies:
       color-name: 1.1.4
@@ -4085,6 +5197,8 @@ snapshots:
       delayed-stream: 1.0.0
 
   commander@4.1.1: {}
+
+  commander@8.3.0: {}
 
   concat-map@0.0.1: {}
 
@@ -4644,6 +5758,13 @@ snapshots:
     dependencies:
       function-bind: 1.1.2
 
+  hogan.js@3.0.2:
+    dependencies:
+      mkdirp: 0.3.0
+      nopt: 1.0.10
+
+  htm@3.1.1: {}
+
   ignore@5.3.2: {}
 
   import-fresh@3.3.0:
@@ -4652,6 +5773,28 @@ snapshots:
       resolve-from: 4.0.0
 
   imurmurhash@0.1.4: {}
+
+  instantsearch-ui-components@0.11.1:
+    dependencies:
+      '@babel/runtime': 7.26.0
+
+  instantsearch.css@8.5.1: {}
+
+  instantsearch.js@4.77.1(algoliasearch@5.20.0):
+    dependencies:
+      '@algolia/events': 4.0.1
+      '@types/dom-speech-recognition': 0.0.1
+      '@types/google.maps': 3.58.1
+      '@types/hogan.js': 3.0.5
+      '@types/qs': 6.9.18
+      algoliasearch: 5.20.0
+      algoliasearch-helper: 3.23.1(algoliasearch@5.20.0)
+      hogan.js: 3.0.2
+      htm: 3.1.1
+      instantsearch-ui-components: 0.11.1
+      preact: 10.25.4
+      qs: 6.9.7
+      search-insights: 2.17.3
 
   internal-slot@1.1.0:
     dependencies:
@@ -4782,6 +5925,8 @@ snapshots:
 
   isexe@2.0.0: {}
 
+  isomorphic.js@0.2.5: {}
+
   iterator.prototype@1.1.5:
     dependencies:
       define-data-property: 1.1.4
@@ -4829,6 +5974,10 @@ snapshots:
       object.assign: 4.1.7
       object.values: 1.2.1
 
+  katex@0.16.21:
+    dependencies:
+      commander: 8.3.0
+
   keyv@4.5.4:
     dependencies:
       json-buffer: 3.0.1
@@ -4844,6 +5993,12 @@ snapshots:
       prelude-ls: 1.2.1
       type-check: 0.4.0
 
+  lexical@0.27.1: {}
+
+  lib0@0.2.99:
+    dependencies:
+      isomorphic.js: 0.2.5
+
   lilconfig@3.1.3: {}
 
   lines-and-columns@1.2.4: {}
@@ -4851,6 +6006,8 @@ snapshots:
   locate-path@6.0.0:
     dependencies:
       p-locate: 5.0.0
+
+  lodash-es@4.17.21: {}
 
   lodash.merge@4.6.2: {}
 
@@ -4896,6 +6053,8 @@ snapshots:
   minimist@1.2.8: {}
 
   minipass@7.1.2: {}
+
+  mkdirp@0.3.0: {}
 
   ms@2.1.3: {}
 
@@ -4955,6 +6114,10 @@ snapshots:
     transitivePeerDependencies:
       - '@babel/core'
       - babel-plugin-macros
+
+  nopt@1.0.10:
+    dependencies:
+      abbrev: 1.1.1
 
   normalize-path@3.0.0: {}
 
@@ -5138,6 +6301,8 @@ snapshots:
     optionalDependencies:
       fsevents: 2.3.3
 
+  prismjs@1.29.0: {}
+
   prop-types@15.8.1:
     dependencies:
       loose-envify: 1.4.0
@@ -5148,7 +6313,14 @@ snapshots:
 
   punycode@2.3.1: {}
 
+  qs@6.9.7: {}
+
   queue-microtask@1.2.3: {}
+
+  react-colorful@5.6.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0):
+    dependencies:
+      react: 19.0.0
+      react-dom: 19.0.0(react@19.0.0)
 
   react-day-picker@9.5.0(react@19.0.0):
     dependencies:
@@ -5162,6 +6334,16 @@ snapshots:
       react: 19.0.0
       scheduler: 0.25.0
 
+  react-error-boundary@3.1.4(react@19.0.0):
+    dependencies:
+      '@babel/runtime': 7.26.0
+      react: 19.0.0
+
+  react-error-boundary@5.0.0(react@19.0.0):
+    dependencies:
+      '@babel/runtime': 7.26.0
+      react: 19.0.0
+
   react-hook-form@7.54.2(react@19.0.0):
     dependencies:
       react: 19.0.0
@@ -5173,6 +6355,17 @@ snapshots:
       react: 19.0.0
       react-style-singleton: 2.2.3(@types/react@19.0.2)(react@19.0.0)
       tslib: 2.8.1
+    optionalDependencies:
+      '@types/react': 19.0.2
+
+  react-remove-scroll@2.5.5(@types/react@19.0.2)(react@19.0.0):
+    dependencies:
+      react: 19.0.0
+      react-remove-scroll-bar: 2.3.8(@types/react@19.0.2)(react@19.0.0)
+      react-style-singleton: 2.2.3(@types/react@19.0.2)(react@19.0.0)
+      tslib: 2.8.1
+      use-callback-ref: 1.3.3(@types/react@19.0.2)(react@19.0.0)
+      use-sidecar: 1.1.3(@types/react@19.0.2)(react@19.0.0)
     optionalDependencies:
       '@types/react': 19.0.2
 
@@ -5269,6 +6462,8 @@ snapshots:
       is-regex: 1.2.1
 
   scheduler@0.25.0: {}
+
+  search-insights@2.17.3: {}
 
   semver@6.3.1: {}
 
@@ -5685,6 +6880,10 @@ snapshots:
   yallist@4.0.0: {}
 
   yaml@2.7.0: {}
+
+  yjs@13.6.24:
+    dependencies:
+      lib0: 0.2.99
 
   yocto-queue@0.1.0: {}
 

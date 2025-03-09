@@ -22,6 +22,7 @@ declare module "next-auth" {
   interface Session extends DefaultSession {
     user: DefaultSession["user"] & {
       id: string;
+      apiKey: string;
     };
   }
 }
@@ -35,6 +36,7 @@ export const authOptions: NextAuthOptions = {
           ...session.user,
           id: token.id ?? "",
           email: token.email ?? "",
+          apiKey: token.apiKey ?? "",
         },
       };
     },
@@ -42,6 +44,7 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id;
         token.email = user.email;
+        token.apiKey = user.apiKey;
       }
       return token;
     },
@@ -59,6 +62,19 @@ export const authOptions: NextAuthOptions = {
         const { email, password } = loginUserSchema.parse(credentials);
         const user = await db.user.findUnique({
           where: { email: email.toLowerCase() },
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            password: true,
+            apiKeys: {
+              select: {
+                id: true,
+                value: true,
+                permissions: true,
+              },
+            },
+          },
         });
 
         if (!user) {
@@ -70,12 +86,27 @@ export const authOptions: NextAuthOptions = {
               password: hashedPassword,
               // Add any other initial user data
             },
+            select: {
+              id: true,
+              email: true,
+              name: true,
+              apiKeys: {
+                select: {
+                  id: true,
+                  value: true,
+                  permissions: true,
+                },
+              },
+            },
           });
 
           return {
             id: newUser.id,
             email: newUser.email,
             name: newUser.name,
+            apiKey: newUser.apiKeys.find((key) =>
+              key.permissions.includes("write")
+            )?.value,
           };
         }
 
@@ -84,6 +115,9 @@ export const authOptions: NextAuthOptions = {
             id: user.id,
             email: user.email,
             name: user.name,
+            apiKey: user.apiKeys.find((key) =>
+              key.permissions.includes("write")
+            )?.value,
           };
           // biome-ignore lint/style/noUselessElse: <explanation>
         } else {

@@ -1,0 +1,49 @@
+version: '3'
+services:
+  typesense1:
+    image: typesense/typesense:27.1
+    restart: on-failure
+    ports:
+      - "8108:8108"
+    volumes:
+      - ./typesense-data1:/data
+    command:
+      - --data-dir=/data
+      - --api-key=xyz
+      - --enable-cors
+      - --api-address=0.0.0.0
+      - --api-port=8108
+      - --peering-address=typesense1:8107
+      - --nodes=typesense1:8107,typesense2:8107,typesense3:8107
+
+  typesense2:
+    image: typesense/typesense:27.1
+    restart: on-failure
+    ports:
+      - "8109:8108"
+    volumes:
+      - ./typesense-data2:/data
+    command:
+      - --data-dir=/data
+      - --api-key=xyz
+      - --enable-cors
+      - --api-address=0.0.0.0
+      - --api-port=8108
+      - --peering-address=typesense2:8107
+      - --nodes=typesense1:8107,typesense2:8107,typesense3:8107
+
+  typesense3:
+    image: typesense/typesense:27.1
+    restart: on-failure
+    ports:
+      - "8110:8108"
+    volumes:
+      - ./typesense-data3:/data
+    command:
+      - --data-dir=/data
+      - --api-key=xyz
+      - --enable-cors
+      - --api-address=0.0.0.0
+      - --api-port=8108
+      - --peering-address=typesense3:8107
+      - --nodes=typesense1:8107,typesense2:8107,typesense3:8107

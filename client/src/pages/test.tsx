@@ -1,95 +1,121 @@
-import GenerateApiKey from "@/components/GenerateApiKey";
-import { movies } from "../components/movies";
-import SearchData from "@/components/SearchData";
-import { Button } from "@/components/ui/button";
+import { useState } from "react";
 import { api } from "@/utils/api";
+import GenerateApiKey from "@/components/GenerateApiKey";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { useSession } from "next-auth/react";
-import type React from "react";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/router";
 
-export default function Home() {
+const Dashboard = () => {
   const session = useSession();
-  const router = useRouter();
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
-  const { mutate } = api.user.createUser.useMutation({});
-  const { data } = api.user.getAllUsers.useQuery();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [indexContent, setIndexContent] = useState("");
+  const [searchResults, setSearchResults] = useState<any[]>([]);
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value, type } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+  const handleSearch = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/search?q=${searchQuery}`,
+        {
+          headers: {
+            "x-api-key": localStorage.getItem("apiKey") || "",
+          },
+        }
+      );
+      const data = await response.json();
+      setSearchResults(data.hits || []);
+    } catch (error) {
+      console.error("Search error:", error);
+    }
   };
 
-  console.log(data, "data");
-  console.log(session, "data");
-  useEffect(() => {
-    if (session.status === "unauthenticated") {
-      console.log(session, "session");
-      router.push("/login");
+  const handleIndex = async () => {
+    try {
+      const response = await fetch(`http://localhost:9000/api/index`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": "sk_J3nn_vEOxIgRiasr80jBsdNA_HRmBSZ9",
+        },
+        body: JSON.stringify({ content: indexContent }),
+      });
+      //sk_J3nn_vEOxIgRiasr80jBsdNA_HRmBSZ9
+
+      const data = await response.json();
+      console.log("data", data);
+      if (data.success) {
+        // setIndexContent("");
+        alert("Content indexed successfully!");
+      }
+    } catch (error) {
+      console.error("Indexing error:", error);
     }
-  }, [session, router]);
-
+  };
+  console.log(session, "session");
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-6">
-      <h1 className="text-xl font-bold">User Dashboard</h1>
+    <div className="container mx-auto p-6 space-y-8">
+      <h1 className="text-3xl font-bold">Search Dashboard</h1>
 
-      <div>
-        <p>Create User</p>
-        <input
-          type="email"
-          name="email"
-          value={formData.email}
-          onChange={handleInputChange}
-        />
-        <input
-          type="password"
-          name="password"
-          value={formData.password}
-          onChange={handleInputChange}
-        />
-        {/* biome-ignore lint/a11y/useButtonType: <explanation> */}
-        <button
-          onClick={() => {
-            mutate(formData);
-          }}
-        >
-          mutate
-        </button>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="space-y-6">
+          <div>
+            <h2 className="text-xl font-semibold mb-4">Index Content</h2>
+            <div className="space-y-2">
+              <Label>Content</Label>
+              <Textarea
+                value={indexContent}
+                onChange={(e) => setIndexContent(e.target.value)}
+                placeholder="Enter content to index..."
+                className="min-h-[200px]"
+              />
+              <Button onClick={handleIndex} className="w-full">
+                Index Content
+              </Button>
+            </div>
+          </div>
+
+          <GenerateApiKey />
+        </div>
+
+        <div className="space-y-6">
+          <div>
+            <h2 className="text-xl font-semibold mb-4">Search</h2>
+            <div className="space-y-2">
+              <Label>Search Query</Label>
+              <div className="flex gap-2">
+                <Input
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Enter search query..."
+                />
+                <Button onClick={handleSearch}>Search</Button>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-lg font-semibold mb-2">Search Results</h3>
+            <div className="space-y-4">
+              {searchResults.map((result: any, index: number) => (
+                <div
+                  key={index}
+                  className="p-4 border rounded-lg hover:bg-gray-50"
+                >
+                  <pre className="whitespace-pre-wrap">
+                    {JSON.stringify(result.document, null, 2)}
+                  </pre>
+                </div>
+              ))}
+              {searchResults.length === 0 && (
+                <p className="text-gray-500">No results found</p>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
-
-      <GenerateApiKey />
-      <Button onClick={indexDocument}> indexDocument</Button>
-      {/* <IndexData /> */}
-
-      <SearchData />
     </div>
   );
-}
-
-// Example request to index a document
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-const indexDocument = async (document: any) => {
-  const response = await fetch("http://localhost:9000/api/index", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-api-key": "sk_0rE-Zc9mR69XibmKZ-lQLtQIujSsKpgo",
-    },
-    body: JSON.stringify(movies),
-  });
-
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message);
-  }
-
-  return await response.json();
 };
+
+export default Dashboard;

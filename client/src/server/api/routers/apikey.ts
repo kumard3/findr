@@ -7,7 +7,7 @@ import { nanoid } from "nanoid";
 const createApiKeySchema = z.object({
   name: z.string().min(1).max(100),
   type: z.enum(["search", "write", "admin"]),
-  expiresIn: z.number().optional(), // days
+  expiresIn: z.number().optional(),
   allowedOperations: z.array(z.enum(["search", "write", "delete"])),
   ipRestrictions: z.array(z.string()).optional(),
 });
@@ -17,36 +17,16 @@ export const apiKeyRouter = createTRPCRouter({
     .input(createApiKeySchema)
     .mutation(async ({ ctx, input }) => {
       const { session } = ctx;
-    //   await ctx.db.tier.createMany({
-    //     data: [
-    //       {
-    //         name: "free",
-    //         price: 0,
-    //         documentLimit: 1000,
-    //         storageLimit: 100000000, // 100MB in bytes
-    //         searchesPerDay: 100,
-    //         apiKeys: 2,
-    //         collections: 1,
-    //         features: ["search", "basic_indexing"]
-    //       },
-    //       {
-    //         name: "pro",
-    //         price: 29.99,
-    //         documentLimit: 10000,
-    //         storageLimit: 1000000000, // 1GB in bytes
-    //         searchesPerDay: 1000,
-    //         apiKeys: 5,
-    //         collections: 5,
-    //         features: ["search", "advanced_indexing", "analytics"]
-    //       }
-    //     ]
-    //   });
-      // Check user's tier limits
+
+      // Fetch user with tier info and API key count
       const user = await ctx.db.user.findUnique({
         where: { id: session.user.id },
         include: {
-          _count: {
-            select: { apiKeys: true },
+          _count: { select: { apiKeys: true } },
+          tier: {
+            select: {
+              name: true,
+            },
           },
         },
       });
@@ -58,55 +38,51 @@ export const apiKeyRouter = createTRPCRouter({
         });
       }
 
-      // Get tier limits
-      const tierLimits = await ctx.db.tier.findUnique({
-        where: { name: user.tier },
-      });
+      // Define tier limits (could be fetched from a `tier` table)
+      const tierLimits = {
+        free: { apiKeys: 100 },
+        pro: { apiKeys: 500 },
+        enterprise: { apiKeys: 1000 },
+      };
+      const userTier = user.tier?.name || "free"; // Default to "free" if not set
+      const maxKeys = tierLimits[userTier as keyof typeof tierLimits]?.apiKeys;
 
-      if (!tierLimits) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Tier not found",
-        });
-      }
-
-      // Check API key limit
-      if (user._count.apiKeys >= tierLimits.apiKeys) {
+      if (user._count.apiKeys >= maxKeys) {
         throw new TRPCError({
           code: "FORBIDDEN",
-          message: `API key limit reached for ${user.tier} tier`,
+          message: `API key limit (${maxKeys}) reached for ${userTier} tier`,
         });
       }
 
-      // Generate API key
       const apiKey = await ctx.db.apiKey.create({
         data: {
           value: `sk_${nanoid(32)}`,
           name: input.name,
-          type: input.type,
+          permissions: input.allowedOperations,
           userId: session.user.id,
           status: "active",
-          allowedOperations: input.allowedOperations,
           ipRestrictions: input.ipRestrictions ?? [],
           expiresAt: input.expiresIn
             ? new Date(Date.now() + input.expiresIn * 24 * 60 * 60 * 1000)
             : null,
+          rateLimit: input.type === "admin" ? 1000 : 100,
+          requestCount: 0,
+          lastUsed: new Date(),
         },
       });
 
       return {
         id: apiKey.id,
-        value: apiKey.value, // Only show value once
+        value: apiKey.value,
         name: apiKey.name,
-        type: apiKey.type,
         createdAt: apiKey.createdAt,
         expiresAt: apiKey.expiresAt,
+        permissions: apiKey.permissions,
       };
     }),
 
   list: protectedProcedure.query(async ({ ctx }) => {
     const { session } = ctx;
-
     return await ctx.db.apiKey.findMany({
       where: {
         userId: session.user.id,
@@ -115,16 +91,15 @@ export const apiKeyRouter = createTRPCRouter({
       select: {
         id: true,
         name: true,
-        type: true,
         status: true,
         createdAt: true,
         expiresAt: true,
         lastUsed: true,
-        allowedOperations: true,
+        permissions: true,
+        requestCount: true,
+        rateLimit: true,
       },
-      orderBy: {
-        createdAt: "desc",
-      },
+      orderBy: { createdAt: "desc" },
     });
   }),
 
@@ -134,16 +109,13 @@ export const apiKeyRouter = createTRPCRouter({
       const { session } = ctx;
 
       const apiKey = await ctx.db.apiKey.findFirst({
-        where: {
-          id: input,
-          userId: session.user.id,
-        },
+        where: { id: input, userId: session.user.id },
       });
 
       if (!apiKey) {
         throw new TRPCError({
           code: "NOT_FOUND",
-          message: "API key not found",
+          message: "API key not found or does not belong to you",
         });
       }
 

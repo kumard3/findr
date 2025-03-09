@@ -1,95 +1,124 @@
 import { Client } from "typesense";
-import type { SearchParams, IndexError, Env } from "../types";
+import type { SearchParams, IndexError, ValidatedDocument } from "../types";
+import env from "../env";
+import { z } from "zod";
+import { DocumentSchema } from "typesense/lib/Typesense/Documents";
+import fs from "fs";
+import { db } from "@/db";
+const TypesenseConfigSchema = z.object({
+  host: z.string().min(1),
+  port: z.number().int().positive(),
+  adminKey: z.string().min(1),
+});
 
 export class TypesenseService {
-  private client: Client;
+  private _client: Client;
 
-  constructor(env: Env) {
-    this.client = new Client({
-      nodes: [
-        {
-          host: "localhost",
-          port: 8108,
-          protocol: "http",
-        },
-      ],
-      apiKey: "xyz",
+  public get client(): Client {
+    return this._client;
+  }
+
+  constructor() {
+    const config = TypesenseConfigSchema.parse({
+      host: env.TYPESENSE_HOST,
+      port: env.TYPESENSE_PORT,
+      adminKey: env.TYPESENSE_ADMIN_KEY,
+    });
+
+    this._client = new Client({
+      nodes: [{ host: config.host, port: config.port, protocol: "http" }],
+      apiKey: config.adminKey,
       connectionTimeoutSeconds: 2,
     });
   }
 
-  async createOrGetCollection(userId: string) {
-    const collectionName = `collection_${userId}`;
+  async createOrGetCollection(collectionName: string) {
     try {
       return await this.client.collections(collectionName).retrieve();
     } catch (error) {
-      // Create collection with dynamic schema
-
+      const getUserId = collectionName.split("_")[1];
+      console.log("getUserId", getUserId);
+      await db.collection.create({
+        data: {
+          name: collectionName,
+          userId: getUserId,
+        },
+      });
       return await this.client.collections().create({
         name: collectionName,
         fields: [
-          { name: "user_id", type: "string", facet: true },
           { name: "indexed_at", type: "int64", sort: true },
-          // Allow any field with auto schema detection
           { name: ".*", type: "auto" },
         ],
         default_sorting_field: "indexed_at",
+        enable_nested_fields: true,
       });
     }
   }
 
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-  async indexDocument(userId: string, document: any) {
+  async indexDocument(collectionName: string, document: DocumentSchema[]) {
     try {
-      await this.createOrGetCollection(userId);
-      const collection = this.client.collections(`collection_${userId}`);
+      // Ensure the collection exists
+      await this.createOrGetCollection(collectionName);
+      const collection = this.client.collections(collectionName);
 
-      const documents = Array.isArray(document) ? document : [document];
-
-      const enrichedDocuments = documents.map((doc) => ({
-        ...doc,
-        user_id: userId,
-        indexed_at: Date.now(),
-        // Preserve original id if exists, otherwise generate one
-        id:
-          doc.id?.toString() ||
-          `${userId}_${Date.now()}_${Math.random().toString(36).slice(2)}`,
-      }));
-
-      // Use import for better performance
-      return await collection.documents().import(enrichedDocuments, {
+      const indexedDocs = await collection.documents().import(document, {
         action: "create",
         dirty_values: "coerce_or_reject",
+        batch_size: 100,
       });
+
+      return indexedDocs;
     } catch (error) {
+      // console.error("Error indexing document:", error);
       const indexError: IndexError = new Error(
         error instanceof Error ? error.message : "Index error"
       ) as IndexError;
       indexError.code = "SCHEMA_ERROR";
       indexError.details = error;
+      fs.appendFileSync("indexError.log", `${JSON.stringify(error)}\n`);
+
       throw indexError;
     }
   }
 
-  async search(userId: string, params: SearchParams) {
-    const searchParams = {
-      ...params,
-      filter_by: `user_id:=${userId}`,
-      per_page: Math.min(params.per_page || 10, 100),
-      max_hits: Math.min(params.max_hits || 1000, 10000),
-    };
+  async search(userId: string, collectionName: string, params: SearchParams) {
+    try {
+      const searchParams = {
+        ...params,
+        query_by: "document",
+        per_page: Math.min(params.per_page || 10, 100),
+        max_hits: Math.min(params.max_hits || 1000, 10000),
+        collection_name: `collection_${userId}_${collectionName}`,
+      };
 
-    return await this.client
-      .collections(`collection_${userId}`)
-      .documents()
-      .search(searchParams);
+      return await this.client
+        .collections(`collection_${userId}_${collectionName}`)
+        .documents()
+        .search({
+          ...searchParams,
+        });
+    } catch (error) {
+      fs.appendFileSync("searchError.log", `${JSON.stringify(error)}\n`);
+      throw error;
+    }
   }
 
   async deleteCollection(userId: string) {
     try {
       return await this.client.collections(`collection_${userId}`).delete();
     } catch (error) {
-      // Ignore if collection doesn't exist
+      return null;
+    }
+  }
+
+  async getDocuments(collectionName: string) {
+    console.log("collectionName", collectionName);
+    try {
+      return await this.client.collections(collectionName).documents().export({
+        exclude_fields: "id,indexed_at",
+      });
+    } catch (error) {
       return null;
     }
   }

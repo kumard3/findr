@@ -14,7 +14,7 @@ dist/
 # deps
 node_modules/
 .wrangler
-
+/prisma/migrations*
 # env
 .env
 .env.production

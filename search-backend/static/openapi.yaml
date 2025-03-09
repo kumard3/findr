@@ -1,0 +1,249 @@
+openapi: 3.1.0
+info:
+  title: Search Backend API
+  description: API for document indexing, searching, and management
+  version: 1.0.0
+servers:
+  - url: http://localhost:9000
+    description: Development server
+
+paths:
+  /api/index:
+    post:
+      summary: Index documents
+      description: Index a single document or bulk documents
+      operationId: indexDocuments
+      security:
+        - apiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                indexName:
+                  type: string
+                  description: Name of the index
+                body:
+                  oneOf:
+                    - type: object
+                      description: Single document to index
+                    - type: array
+                      description: Array of documents for bulk indexing
+                      items:
+                        type: object
+      responses:
+        "202":
+          description: Indexing job accepted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        "400":
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "401":
+          description: Unauthorized - Invalid or missing API key
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /api/search:
+    get:
+      summary: Search documents
+      description: Search indexed documents with various parameters
+      operationId: searchDocuments
+      security:
+        - apiKeyAuth: []
+      parameters:
+        - name: q
+          in: query
+          description: Search query
+          required: false
+          schema:
+            type: string
+        - name: per_page
+          in: query
+          description: Number of results per page
+          required: false
+          schema:
+            type: integer
+            default: 10
+        - name: page
+          in: query
+          description: Page number
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: collection_name
+          in: query
+          description: Name of the collection to search
+          required: false
+          schema:
+            type: string
+            default: default
+      responses:
+        "200":
+          description: Search results
+          content:
+            application/json:
+              schema:
+                type: object
+        "400":
+          description: Search error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /api/documents/{id}:
+    delete:
+      summary: Delete a document
+      description: Delete a document by ID
+      operationId: deleteDocument
+      security:
+        - apiKeyAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Document deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+        "403":
+          description: Write permission required
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "500":
+          description: Delete operation failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /api/stats:
+    get:
+      summary: Get collection statistics
+      description: Get statistics about collections and usage
+      operationId: getStats
+      security:
+        - apiKeyAuth: []
+      responses:
+        "200":
+          description: Collection and usage statistics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  collection:
+                    type: object
+                  usage:
+                    type: object
+                    properties:
+                      used:
+                        type: number
+                      storage:
+                        type: number
+        "500":
+          description: Failed to get stats
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /api/usage:
+    get:
+      summary: Get usage statistics
+      description: Get detailed usage statistics and logs
+      operationId: getUsage
+      security:
+        - apiKeyAuth: []
+      responses:
+        "200":
+          description: Usage statistics and logs
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  logs:
+                    type: array
+                    items:
+                      type: object
+                  stats:
+                    type: array
+                    items:
+                      type: object
+                  limits:
+                    type: object
+                    properties:
+                      used:
+                        type: number
+                      storage:
+                        type: number
+                      limit:
+                        type: number
+        "500":
+          description: Failed to fetch usage data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+components:
+  securitySchemes:
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: API key authentication
+
+tags:
+  - name: Search
+    description: Search and indexing operations
+  - name: Analytics
+    description: Usage statistics and analytics

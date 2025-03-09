@@ -1,40 +1,49 @@
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
+import { useRouter } from "next/router";
+import { useSession } from "next-auth/react";
+import { api } from "@/utils/api";
 
 const plans = [
   {
-    name: "Basic plan",
-    price: "$19",
-    description: "Lorem ipsum dolor sit amet",
+    name: "Free",
+    price: "$0",
+    description: "Perfect for getting started",
     features: [
-      "Feature text goes here",
-      "Feature text goes here",
-      "Feature text goes here",
-      "Feature text goes here",
-      "Feature text goes here",
-      "Feature text goes here",
+      "1,000 documents",
+      "100 searches per day",
+      "1 API key",
+      "1 collection",
+      "Basic support",
     ],
+    tierId: "free",
   },
   {
-    name: "Business plan",
+    name: "Pro",
     price: "$29",
-    description: "Lorem ipsum dolor sit amet",
+    description: "For growing businesses",
     features: [
-      "Feature text goes here",
-      "Feature text goes here",
-      "Feature text goes here",
-      "Feature text goes here",
-      "Feature text goes here",
-      "Feature text goes here",
-      "Feature text goes here",
-      "Feature text goes here",
-      "Feature text goes here",
-      "Feature text goes here",
+      "10,000 documents",
+      "1,000 searches per day",
+      "5 API keys",
+      "5 collections",
+      "Priority support",
+      "Advanced analytics",
+      "Custom integration",
     ],
+    tierId: "pro",
   },
 ];
 
-export function Pricing() {
+export function PricingTable() {
+  const router = useRouter();
+  const { data: session } = useSession();
+  const activateTier = api.tier.activate.useMutation({
+    onSuccess: () => {
+      router.push("/dashboard");
+    },
+  });
+
   return (
     <section className="container py-24">
       <div className="text-center">
@@ -58,10 +67,7 @@ export function Pricing() {
 
       <div className="mt-12 grid gap-8 md:grid-cols-2">
         {plans.map((plan) => (
-          <div
-            key={plan.name}
-            className="rounded-lg border p-8"
-          >
+          <div key={plan.name} className="rounded-lg border p-8">
             <div className="flex items-start gap-4">
               <div className="rounded-lg bg-primary/10 p-3">
                 <div className="h-6 w-6" />
@@ -88,7 +94,18 @@ export function Pricing() {
               </ul>
             </div>
 
-            <Button className="mt-8 w-full">Get started</Button>
+            <Button
+              className="mt-8 w-full"
+              onClick={() => {
+                if (!session) {
+                  router.push("/auth/signin");
+                  return;
+                }
+                activateTier.mutate({ tierId: plan.tierId });
+              }}
+            >
+              {session ? "Get started" : "Sign in to start"}
+            </Button>
           </div>
         ))}
       </div>

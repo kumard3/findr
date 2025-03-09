@@ -25,6 +25,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { toast } from "sonner";
 import { Loader } from "lucide-react";
+import Link from "next/link";
 const formSchema = z.object({
   password: z.string().min(1, {
     message: "please enter the password",
@@ -62,7 +63,7 @@ export function LoginForm() {
 
   useEffect(() => {
     if (session.status === "authenticated") {
-      void router.push("/");
+      void router.push("/dashboard");
     }
   }, [router, session]);
   return (
@@ -74,6 +75,12 @@ export function LoginForm() {
         </CardDescription>
       </CardHeader>
       <CardContent>
+        <div className="mb-4 text-center text-sm text-muted-foreground">
+          Don't have an account?{" "}
+          <Link href="/auth/signup" className="text-primary hover:underline">
+            Sign up
+          </Link>
+        </div>
         <Form {...form}>
           <form className="space-y-3" onSubmit={form.handleSubmit(onSubmit)}>
             <FormField
