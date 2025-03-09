@@ -43,35 +43,7 @@ export function CollectionsTable() {
   } | null>(null);
   const itemsPerPage = 10;
 
-  const {data:collectionData} = api.collection.getCollections.useQuery()
-console.log(collectionData,"collectionData")
-  // useEffect(() => {
-  //   const fetchUsage = async () => {
-  //     try {
-  //       const usageData = await searchApi.getUsage();
-  //       setUsage(usageData);
-  //     } catch (error) {
-  //       console.error("Error fetching usage:", error);
-  //     }
-  //   };
-
-  //   fetchUsage();
-  // }, []);
-
-  // const handleNewCollection = async () => {
-  //   try {
-  //     await searchApi.generateApiKey({
-  //       name: "New Collection",
-  //       type: "admin", // Adding required 'type' field
-  //       allowedOperations: ["search", "write", "delete"],
-  //     });
-  //     // Refresh usage data after creating a new collection
-  //     const usageData = await searchApi.getUsage();
-  //     setUsage(usageData);
-  //   } catch (error) {
-  //     console.error("Error creating collection:", error);
-  //   }
-  // };
+  const { data: collectionData } = api.collection.getCollections.useQuery();
 
   const filteredCollections = collections.filter((collection) =>
     collection.name.toLowerCase().includes(searchQuery.toLowerCase())

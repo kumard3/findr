@@ -40,7 +40,6 @@ const indexWorker = new Worker(
         // Schedule batches with a 10-second delay between each
         let delay = 0;
         for (const batch of batches) {
-          // fs.appendFileSync("batch-files.json", `${JSON.stringify(batch)}\n`);
           await indexQueue.add(
             "batchIndexJob",
             {

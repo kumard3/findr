@@ -105,6 +105,7 @@ model Collection {
     @@index([userId])
 }
 
+
 model UsageLog {
     id           String      @id @default(cuid())
     userId       String
@@ -208,5 +209,3 @@ model VerificationToken {
 
     @@unique([identifier, token])
 }
-
-

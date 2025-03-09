@@ -33,6 +33,9 @@ const app = new Hono<{ Bindings: Env; Variables: CustomContext }>();
 app.use("*", cors());
 
 app.use("*", async (c, next) => {
+  if (c.req.path === "/") {
+    return c.redirect("/doc");
+  }
   if (c.req.path.includes("/doc") || c.req.path.includes("/static/")) {
     await next();
     return;
@@ -41,9 +44,7 @@ app.use("*", async (c, next) => {
   if (!apiKey) throw new HTTPException(401, { message: "API key required" });
 
   const validator = new ApiKeyValidator();
-  const keyInfo = await validator.validateKey(
-    "sk_4Etu0CEwfh7C5BAHWJnyu8rfgFyn5Tgh"
-  );
+  const keyInfo = await validator.validateKey(apiKey);
   c.set("keyInfo", keyInfo);
   await next();
 });
@@ -152,6 +153,7 @@ app.get("/api/search", async (c) => {
     });
   }
 });
+
 // Delete document endpoint
 app.delete("/api/documents/:id", async (c) => {
   const keyInfo = c.get("keyInfo");
@@ -198,6 +200,12 @@ app.delete("/api/documents/:id", async (c) => {
       message: error instanceof Error ? error.message : "Delete failed",
     });
   }
+});
+app.get("/api/stats", async (c) => {
+  const keyInfo = c.get("keyInfo");
+  const typesense = new TypesenseService();
+  const stats = await typesense.getCollectionStats(keyInfo.userId);
+  return c.json(stats);
 });
 
 // Collection stats endpoint
@@ -260,6 +268,37 @@ app.get("/api/usage", async (c) => {
     throw new HTTPException(500, {
       message:
         error instanceof Error ? error.message : "Failed to fetch usage data",
+    });
+  }
+}); // Usage statistics endpoint
+app.get("/api/collections", async (c) => {
+  const keyInfo = c.get("keyInfo");
+
+  try {
+    const collections = await db.collection.findMany({
+      where: { userId: keyInfo.userId },
+    });
+
+    return c.json({ collections });
+  } catch (error) {
+    throw new HTTPException(500, {
+      message:
+        error instanceof Error ? error.message : "Failed to fetch usage data",
+    });
+  }
+});
+app.get("/api/documents/:collectionName", async (c) => {
+  try {
+    const collectionName = c.req.param("collectionName");
+    const typesense = new TypesenseService();
+    const documents = await typesense.getDocuments(collectionName);
+    console.log("documents", documents);
+    return c.json({ documents });
+  } catch (error) {
+    console.log("error", error);
+    throw new HTTPException(500, {
+      message:
+        error instanceof Error ? error.message : "Failed to fetch documents",
     });
   }
 });

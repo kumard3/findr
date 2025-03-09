@@ -3,8 +3,8 @@ import type { SearchParams, IndexError, ValidatedDocument } from "../types";
 import env from "../env";
 import { z } from "zod";
 import { DocumentSchema } from "typesense/lib/Typesense/Documents";
-import { HTTPError } from "typesense/lib/Typesense/Errors";
 import fs from "fs";
+import { db } from "@/db";
 const TypesenseConfigSchema = z.object({
   host: z.string().min(1),
   port: z.number().int().positive(),
@@ -36,6 +36,14 @@ export class TypesenseService {
     try {
       return await this.client.collections(collectionName).retrieve();
     } catch (error) {
+      const getUserId = collectionName.split("_")[1];
+      console.log("getUserId", getUserId);
+      await db.collection.create({
+        data: {
+          name: collectionName,
+          userId: getUserId,
+        },
+      });
       return await this.client.collections().create({
         name: collectionName,
         fields: [
@@ -53,8 +61,7 @@ export class TypesenseService {
       // Ensure the collection exists
       await this.createOrGetCollection(collectionName);
       const collection = this.client.collections(collectionName);
-      console.log("document", document);
-      fs.appendFileSync("document.log", `${JSON.stringify(document)}\n`);
+
       const indexedDocs = await collection.documents().import(document, {
         action: "create",
         dirty_values: "coerce_or_reject",
@@ -100,6 +107,17 @@ export class TypesenseService {
   async deleteCollection(userId: string) {
     try {
       return await this.client.collections(`collection_${userId}`).delete();
+    } catch (error) {
+      return null;
+    }
+  }
+
+  async getDocuments(collectionName: string) {
+    console.log("collectionName", collectionName);
+    try {
+      return await this.client.collections(collectionName).documents().export({
+        exclude_fields: "id,indexed_at",
+      });
     } catch (error) {
       return null;
     }
